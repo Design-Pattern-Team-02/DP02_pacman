@@ -71,11 +71,17 @@ public class GameplayPanel extends JPanel implements Runnable {
         }
     }
 
-    //Affichage du jeu : on affiche l'image avec le rendu
+    //Affichage du jeu : on affiche l'image avec le rendu (optimisé pour Mac)
+    @Override
+    protected void paintComponent(Graphics g2) {
+        super.paintComponent(g2);
+        if (img != null) {
+            g2.drawImage(img, 0, 0, width, height, null);
+        }
+    }
+
     public void draw() {
-        Graphics g2 = this.getGraphics();
-        g2.drawImage(img, 0, 0, width, height, null);
-        g2.dispose();
+        repaint();
     }
 
     @Override
