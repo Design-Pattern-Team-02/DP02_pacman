@@ -13,7 +13,7 @@ public abstract class GhostState {
     }
 
     //Différentes transitions possibles d'un état vers un autre
-    public void superPacGumEaten() {}
+    public void frightenedGhostSuperPacGunEaten() {}
     public void timerModeOver() {}
     public void timerFrightenedModeOver() {}
     public void eaten() {}

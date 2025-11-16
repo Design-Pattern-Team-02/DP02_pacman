@@ -1,6 +1,9 @@
 package game;
 
 import game.entities.*;
+import game.entities.superPacGums.*;
+import game.entities.ghostDecorator.*;
+import game.entities.pacmanDecorator.*;
 import game.entities.ghosts.Blinky;
 import game.entities.ghosts.Ghost;
 import game.ghostFactory.*;
@@ -57,6 +60,10 @@ public class Game implements Observer {
                     //Enregistrement des différents observers de Pacman
                     pacman.registerObserver(GameLauncher.getUIPanel());
                     pacman.registerObserver(this);
+
+                    pacman = new SheildPacmanDecorator(pacman, collisionDetector);
+                    pacman = new FastPacmanDecorator(pacman, 3);
+
                 }else if (dataChar.equals("b") || dataChar.equals("p") || dataChar.equals("i") || dataChar.equals("c")) { //Création des fantômes en utilisant les différentes factories
                     switch (dataChar) {
                         case "b":
@@ -74,14 +81,31 @@ public class Game implements Observer {
                     }
 
                     Ghost ghost = abstractGhostFactory.makeGhost(xx * cellSize, yy * cellSize);
-                    ghosts.add(ghost);
                     if (dataChar.equals("b")) {
                         blinky = (Blinky) ghost;
                     }
+                    ghost = new SlowGhostDecorator(ghost, 2);
+                    ghosts.add(ghost);
                 }else if (dataChar.equals(".")) { //Création des PacGums
                     objects.add(new PacGum(xx * cellSize, yy * cellSize));
                 }else if (dataChar.equals("o")) { //Création des SuperPacGums
-                    objects.add(new SuperPacGum(xx * cellSize, yy * cellSize));
+                    int rand = (int)(Math.random() * 4); // 0~3 난수 생성
+                    int px = xx * cellSize;
+                    int py = yy * cellSize;
+                    switch (rand) {
+                        case 0:
+                            objects.add(new FrightenedGhostSuperPacGum(px, py));
+                            break;
+                        case 1:
+                            objects.add(new SlowGhostSuperPacGum(px, py));
+                            break;
+                        case 2:
+                            objects.add(new SheildPacmanSuperPacGum(px, py));
+                            break;
+                        case 3:
+                            objects.add(new FastPacmanSuperPacGum(px, py));
+                            break;
+                    }
                 }else if (dataChar.equals("-")) { //Création des murs de la maison des fantômes
                     objects.add(new GhostHouse(xx * cellSize, yy * cellSize));
                 }
@@ -140,8 +164,13 @@ public class Game implements Observer {
     @Override
     public void updateSuperPacGumEaten(SuperPacGum spg) {
         spg.destroy(); //La SuperPacGum est détruite quand Pacman la mange
-        for (Ghost gh : ghosts) {
-            gh.getState().superPacGumEaten(); //S'il existe une transition particulière quand une SuperPacGum est mangée, l'état des fantômes change
+        if(spg instanceof GhostSuperPacGum){
+            for (Ghost gh : ghosts) {
+                gh.superPacGumEaten(spg);
+            }
+        }
+        else if(spg instanceof PacmanSuperPacGum){
+            pacman.superPacGumEaten(spg);
         }
     }
 

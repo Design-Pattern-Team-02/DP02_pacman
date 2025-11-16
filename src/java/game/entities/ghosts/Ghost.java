@@ -4,6 +4,7 @@ import game.Game;
 import game.entities.MovingEntity;
 import game.ghostStates.*;
 import game.ghostStrategies.IGhostStrategy;
+import game.entities.superPacGums.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -60,7 +61,6 @@ public abstract class Ghost extends MovingEntity {
     }
 
     public void switchFrightenedMode() {
-        frightenedTimer = 0;
         state = frightenedMode;
     }
 
@@ -93,7 +93,7 @@ public abstract class Ghost extends MovingEntity {
     }
 
     @Override
-    public void update() {
+    public void before_updatePosition(){
         if (!Game.getFirstInput()) return; //Les fantômes ne bougent pas tant que le joueur n'a pas bougé
 
         //Si le fantôme est dans l'état effrayé, un timer de 7s se lance, et l'état sera notifié ensuite afin d'appliquer la transition adéquate
@@ -112,6 +112,7 @@ public abstract class Ghost extends MovingEntity {
 
             if ((isChasing && modeTimer >= (60 * 20)) || (!isChasing && modeTimer >= (60 * 5))) {
                 state.timerModeOver();
+                modeTimer = 0;
                 isChasing = !isChasing;
             }
         }
@@ -128,7 +129,6 @@ public abstract class Ghost extends MovingEntity {
 
         //Selon l'état, le fantôme calcule sa prochaine direction, et sa position est ensuite mise à jour
         state.computeNextDir();
-        updatePosition();
     }
 
     @Override
@@ -146,5 +146,16 @@ public abstract class Ghost extends MovingEntity {
             g.drawImage(sprite.getSubimage((int)subimage * size + direction * size * nbSubimagesPerCycle, 0, size, size), this.xPos, this.yPos,null);
         }
 
+    }
+
+    @Override
+    public void superPacGumEaten(SuperPacGum spg){
+        if(!(spg instanceof GhostSuperPacGum)){
+            throw new IllegalArgumentException("Invalid SuperPacGum type. Expected GhostSuperPacGum, but got: " + spg.getClass().getSimpleName());
+        }
+        else if(spg instanceof FrightenedGhostSuperPacGum){
+            frightenedTimer = 0;
+            state.frightenedGhostSuperPacGunEaten();
+        }
     }
 }
