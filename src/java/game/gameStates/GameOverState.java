@@ -15,15 +15,12 @@ public class GameOverState implements GameState {
 
     @Override
     public void changePanel(JFrame window) {
-        // 기존 GameOverPanel( parent, nickname, score ) 사용
-//        SwingUtilities.invokeLater(() -> {
-            window.getContentPane().removeAll();
-            window.getContentPane().add(new GameOverPanel(window, nickname, score));
-            window.revalidate();
-            window.repaint();
-            window.pack();
-            window.setLocationRelativeTo(null);
-//        });
+        window.getContentPane().removeAll();
+        window.getContentPane().add(new GameOverPanel(window, nickname, score));
+        window.revalidate();
+        window.repaint();
+        window.pack();
+        window.setLocationRelativeTo(null);
     }
 
     @Override

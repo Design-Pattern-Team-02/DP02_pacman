@@ -6,7 +6,6 @@ import javax.swing.JFrame;
 public class StartMenuState implements GameState{
     @Override
     public void changePanel(JFrame window) {
-//        window.setContentPane(new StartMenuPanel(window));
         StartMenuPanel menu = new StartMenuPanel(window);
         window.setContentPane(menu);
         window.pack();

@@ -1,6 +1,5 @@
 package game.panel;
 
-import game.GameLauncher;
 import game.GameManager;
 import game.gameStates.StartMenuState;
 
