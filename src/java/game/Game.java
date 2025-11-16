@@ -3,6 +3,8 @@ package game;
 import game.entities.*;
 import game.entities.ghosts.Blinky;
 import game.entities.ghosts.Ghost;
+import game.gameStates.GameOverState;
+import game.gameStates.PlayingState;
 import game.ghostFactory.*;
 import game.ghostStates.EatenMode;
 import game.ghostStates.FrightenedMode;
@@ -10,6 +12,7 @@ import game.utils.CollisionDetector;
 import game.utils.CsvReader;
 import game.utils.KeyHandler;
 
+import javax.swing.*;
 import java.awt.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -55,7 +58,8 @@ public class Game implements Observer {
                     pacman.setCollisionDetector(collisionDetector);
 
                     //Enregistrement des différents observers de Pacman
-                    pacman.registerObserver(GameLauncher.getUIPanel());
+//                   GameLauncher.getUIPanel() -> PlayingState.getUIPanel() 수정
+                    pacman.registerObserver(PlayingState.getUIPanel());
                     pacman.registerObserver(this);
                 }else if (dataChar.equals("b") || dataChar.equals("p") || dataChar.equals("i") || dataChar.equals("c")) { //Création des fantômes en utilisant les différentes factories
                     switch (dataChar) {
@@ -150,8 +154,12 @@ public class Game implements Observer {
         if (gh.getState() instanceof FrightenedMode) {
             gh.getState().eaten(); //S'il existe une transition particulière quand le fantôme est mangé, son état change en conséquence
         }else if (!(gh.getState() instanceof EatenMode)) {
-            System.out.println("Game over !\nScore : " + GameLauncher.getUIPanel().getScore()); //Quand Pacman rentre en contact avec un Fantôme qui n'est ni effrayé, ni mangé, c'est game over !
-            System.exit(0); //TODO
+            GameManager gameManager= GameManager.getInstance();
+            SwingUtilities.invokeLater(() -> {
+                gameManager.changeState(
+                        new GameOverState(gameManager.getPlayerNickname(), PlayingState.getUIPanel().getScore())
+                );
+            });
         }
     }
 

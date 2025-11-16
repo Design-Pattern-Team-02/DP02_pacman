@@ -1,7 +1,7 @@
 package game.ghostStrategies;
 
 import game.Game;
-import game.GameplayPanel;
+import game.panel.GameplayPanel;
 
 //Stratégie concrète de Blinky (le fantôme rouge)
 public class BlinkyStrategy implements IGhostStrategy{
