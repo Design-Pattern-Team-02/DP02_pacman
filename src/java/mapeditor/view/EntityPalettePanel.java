@@ -24,7 +24,6 @@ public class EntityPalettePanel extends JPanel {
     private Map<EntityType, JToggleButton> entityButtons;
     private ButtonGroup buttonGroup;
     private JToggleButton eraseButton;
-    private JButton cancelButton;
 
     public EntityPalettePanel() {
         this.manager = MapEditorManager.getInstance();
@@ -39,7 +38,7 @@ public class EntityPalettePanel extends JPanel {
      * 패널 초기화
      */
     private void initializePanel() {
-        setLayout(new FlowLayout(FlowLayout.LEFT, 8, 8));
+        setLayout(new FlowLayout(FlowLayout.CENTER, 8, 5));
         setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createEmptyBorder(5, 5, 5, 5),
             BorderFactory.createTitledBorder(
@@ -60,11 +59,11 @@ public class EntityPalettePanel extends JPanel {
      */
     private void createButtons() {
         // 필수 엔티티 그룹
-        JPanel requiredPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 3));
+        JPanel requiredPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 3, 3));
         requiredPanel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(255, 200, 100), 1),
             "★ 필수 엔티티",
-            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+            javax.swing.border.TitledBorder.CENTER,
             javax.swing.border.TitledBorder.DEFAULT_POSITION,
             new Font("Arial", Font.BOLD, 12),
             Color.WHITE
@@ -80,11 +79,11 @@ public class EntityPalettePanel extends JPanel {
         add(requiredPanel);
 
         // 자유 배치 엔티티 그룹
-        JPanel freePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 3));
+        JPanel freePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 3, 3));
         freePanel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(100, 200, 255), 1),
             "◆ 자유 배치",
-            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+            javax.swing.border.TitledBorder.CENTER,
             javax.swing.border.TitledBorder.DEFAULT_POSITION,
             new Font("Arial", Font.BOLD, 12),
             Color.WHITE
@@ -97,14 +96,14 @@ public class EntityPalettePanel extends JPanel {
         add(freePanel);
 
         // 도구 그룹
-        JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 3));
+        JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 3, 3));
         toolPanel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(255, 100, 100), 1),
             "▶ 도구",
-            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+            javax.swing.border.TitledBorder.CENTER,
             javax.swing.border.TitledBorder.DEFAULT_POSITION,
             new Font("Arial", Font.BOLD, 12),
-            new Color(255, 100, 100)
+            Color.WHITE
         ));
         toolPanel.setBackground(new Color(55, 55, 55));
 
@@ -131,7 +130,7 @@ public class EntityPalettePanel extends JPanel {
                 }
             }
         };
-        eraseButton.setPreferredSize(new Dimension(80, 40));
+        eraseButton.setPreferredSize(new Dimension(70, 40));
         eraseButton.setBackground(new Color(200, 200, 200));
         eraseButton.setForeground(Color.WHITE);
         eraseButton.setFont(new Font("Arial", Font.BOLD, 12));
@@ -163,67 +162,45 @@ public class EntityPalettePanel extends JPanel {
         buttonGroup.add(eraseButton);
         toolPanel.add(eraseButton);
 
-        // 취소 버튼
-        cancelButton = new JButton("X (취소)");
-        cancelButton.setPreferredSize(new Dimension(80, 40));
-        cancelButton.setBackground(new Color(200, 200, 200));
-        cancelButton.setForeground(Color.WHITE);
-        cancelButton.setFont(new Font("Arial", Font.BOLD, 12));
-        cancelButton.setBorder(BorderFactory.createCompoundBorder(
+        // Undo 버튼
+        JButton undoButton = new JButton("↶ Undo");
+        undoButton.setPreferredSize(new Dimension(70, 40));
+        undoButton.setBackground(new Color(80, 80, 80));
+        undoButton.setForeground(Color.WHITE);
+        undoButton.setFont(new Font("Arial", Font.BOLD, 12));
+        undoButton.setFocusPainted(false);
+        undoButton.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(Color.DARK_GRAY, 2),
             BorderFactory.createEmptyBorder(2, 2, 2, 2)
         ));
-        cancelButton.setFocusPainted(false);
-        cancelButton.addActionListener(e -> {
-            buttonGroup.clearSelection();
-            manager.cancelSelection();
-            updateButtonStates();
-        });
-        toolPanel.add(cancelButton);
-
-        add(toolPanel);
-
-        // Undo/Redo 버튼 그룹
-        JPanel undoRedoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 3));
-        undoRedoPanel.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(new Color(200, 100, 255), 1),
-            "◀ 편집",
-            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
-            javax.swing.border.TitledBorder.DEFAULT_POSITION,
-            new Font("Arial", Font.BOLD, 12),
-            Color.WHITE
-        ));
-        undoRedoPanel.setBackground(new Color(55, 55, 55));
-
-        JButton undoButton = new JButton("↶ Undo");
-        undoButton.setPreferredSize(new Dimension(85, 45));
-        undoButton.setBackground(new Color(80, 80, 80));
-        undoButton.setForeground(Color.WHITE);
-        undoButton.setFocusPainted(false);
-        undoButton.setBorder(BorderFactory.createRaisedBevelBorder());
         undoButton.addActionListener(e -> {
             if (manager.canUndo()) {
                 manager.undo();
                 updateButtonStates();
             }
         });
-        undoRedoPanel.add(undoButton);
+        toolPanel.add(undoButton);
 
+        // Redo 버튼
         JButton redoButton = new JButton("↷ Redo");
-        redoButton.setPreferredSize(new Dimension(85, 45));
+        redoButton.setPreferredSize(new Dimension(70, 40));
         redoButton.setBackground(new Color(80, 80, 80));
         redoButton.setForeground(Color.WHITE);
+        redoButton.setFont(new Font("Arial", Font.BOLD, 12));
         redoButton.setFocusPainted(false);
-        redoButton.setBorder(BorderFactory.createRaisedBevelBorder());
+        redoButton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.DARK_GRAY, 2),
+            BorderFactory.createEmptyBorder(2, 2, 2, 2)
+        ));
         redoButton.addActionListener(e -> {
             if (manager.canRedo()) {
                 manager.redo();
                 updateButtonStates();
             }
         });
-        undoRedoPanel.add(redoButton);
+        toolPanel.add(redoButton);
 
-        add(undoRedoPanel);
+        add(toolPanel);
     }
 
     /**
@@ -264,7 +241,7 @@ public class EntityPalettePanel extends JPanel {
                 }
             }
         };
-        button.setPreferredSize(new Dimension(75, 50));
+        button.setPreferredSize(new Dimension(70, 40));
         button.setBackground(originalColor);
         button.setToolTipText(entityType.getDisplayName());
         button.setBorder(BorderFactory.createCompoundBorder(
