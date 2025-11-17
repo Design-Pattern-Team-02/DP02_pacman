@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -131,7 +133,7 @@ public class EntityPalettePanel extends JPanel {
         };
         eraseButton.setPreferredSize(new Dimension(80, 40));
         eraseButton.setBackground(new Color(200, 200, 200));
-        eraseButton.setForeground(Color.BLACK);
+        eraseButton.setForeground(Color.WHITE);
         eraseButton.setFont(new Font("Arial", Font.BOLD, 12));
         eraseButton.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(Color.DARK_GRAY, 2),
@@ -144,6 +146,20 @@ public class EntityPalettePanel extends JPanel {
                 clearOtherSelections(eraseButton);
             }
         });
+        // 포커스 리스너 추가 - 키보드 방향키 이동 시 선택 상태 업데이트
+        eraseButton.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                // 포커스를 받을 때 다른 버튼들의 선택 해제
+                clearOtherSelections(null);
+                updateButtonStates();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                // 포커스를 잃을 때 처리 (필요시)
+            }
+        });
         buttonGroup.add(eraseButton);
         toolPanel.add(eraseButton);
 
@@ -151,7 +167,7 @@ public class EntityPalettePanel extends JPanel {
         cancelButton = new JButton("X (취소)");
         cancelButton.setPreferredSize(new Dimension(80, 40));
         cancelButton.setBackground(new Color(200, 200, 200));
-        cancelButton.setForeground(Color.BLACK);
+        cancelButton.setForeground(Color.WHITE);
         cancelButton.setFont(new Font("Arial", Font.BOLD, 12));
         cancelButton.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(Color.DARK_GRAY, 2),
@@ -261,8 +277,8 @@ public class EntityPalettePanel extends JPanel {
         String buttonText = entityType.getDisplayName().split(" ")[0];
         button.setText(buttonText);
 
-        // 모든 텍스트를 어두운 색으로 일관성 있게 설정
-        button.setForeground(Color.BLACK);
+        // 모든 텍스트를 흰색으로 설정
+        button.setForeground(Color.WHITE);
         button.setFont(new Font("Arial", Font.BOLD, 12));
 
         // 액션 리스너 추가
@@ -276,6 +292,21 @@ public class EntityPalettePanel extends JPanel {
                     manager.cancelSelection();
                 }
                 updateButtonStates();
+            }
+        });
+
+        // 포커스 리스너 추가 - 키보드 방향키 이동 시 선택 상태 업데이트
+        button.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                // 포커스를 받을 때 다른 버튼들의 선택 해제
+                clearOtherSelections(null);
+                updateButtonStates();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                // 포커스를 잃을 때 처리 (필요시)
             }
         });
 

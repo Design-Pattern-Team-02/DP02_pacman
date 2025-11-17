@@ -184,16 +184,9 @@ public class MapEditorFrame extends JFrame {
      * 새 맵 생성
      */
     private void handleNewMap() {
-        int result = JOptionPane.showConfirmDialog(this,
-            "새 맵을 생성하시겠습니까?\n현재 작업 내용이 저장되지 않았을 수 있습니다.",
-            "새 맵",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE);
-
-        if (result == JOptionPane.YES_OPTION) {
-            manager.createNewMap();
-            palettePanel.clearSelection();
-        }
+        // 다이얼로그 없이 바로 새 맵 생성
+        manager.createNewMap();
+        palettePanel.clearSelection();
     }
 
     /**
@@ -201,10 +194,8 @@ public class MapEditorFrame extends JFrame {
      */
     private void handleSave() {
         if (!manager.validateMap()) {
-            JOptionPane.showMessageDialog(this,
-                manager.getValidationErrorMessage(),
-                "맵 저장 실패",
-                JOptionPane.ERROR_MESSAGE);
+            // 유효성 검사 실패 시 콘솔에 오류 메시지 출력
+            System.err.println("맵 저장 실패: " + manager.getValidationErrorMessage());
             return;
         }
 
@@ -221,22 +212,17 @@ public class MapEditorFrame extends JFrame {
             String nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.'));
             String imgPath = "src/resources/img/" + nameWithoutExt + "_bg.png";
 
-            JOptionPane.showMessageDialog(this,
-                "맵이 성공적으로 저장되었습니다!\n\n" +
-                "CSV 파일: " + csvPath + "\n" +
-                "배경 이미지: " + imgPath + "\n\n" +
-                "게임에서 이 맵을 사용하려면 Game.java에서\n" +
-                "\"level/" + fileName + "\"로 변경하세요.",
-                "저장 완료",
-                JOptionPane.INFORMATION_MESSAGE);
+            // 콘솔에 저장 완료 메시지 출력
+            System.out.println("맵이 성공적으로 저장되었습니다!");
+            System.out.println("CSV 파일: " + csvPath);
+            System.out.println("배경 이미지: " + imgPath);
+            System.out.println("게임에서 이 맵을 사용하려면 Game.java에서 \"level/" + fileName + "\"로 변경하세요.");
 
             manager.setLastSavedFilePath(csvPath);
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                "맵 저장 중 오류가 발생했습니다:\n" + e.getMessage(),
-                "저장 실패",
-                JOptionPane.ERROR_MESSAGE);
+            // 오류 발생 시 콘솔에 출력
+            System.err.println("맵 저장 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
@@ -244,82 +230,57 @@ public class MapEditorFrame extends JFrame {
      * 모두 지우기
      */
     private void handleClearAll() {
-        int result = JOptionPane.showConfirmDialog(this,
-            "맵의 모든 엔티티를 지우시겠습니까?",
-            "모두 지우기",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE);
-
-        if (result == JOptionPane.YES_OPTION) {
-            manager.resetMap();
-            palettePanel.clearSelection();
-        }
+        // 다이얼로그 없이 바로 모든 엔티티 지우기
+        manager.resetMap();
+        palettePanel.clearSelection();
     }
 
     /**
      * 종료 처리
      */
     private void handleExit() {
-        int result = JOptionPane.showConfirmDialog(this,
-            "맵 에디터를 종료하시겠습니까?\n저장되지 않은 변경사항이 있을 수 있습니다.",
-            "종료 확인",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE);
-
-        if (result == JOptionPane.YES_OPTION) {
-            System.exit(0);
-        }
+        // 다이얼로그 없이 바로 종료
+        System.exit(0);
     }
 
     /**
-     * About 다이얼로그
+     * About 정보 출력
      */
     private void showAboutDialog() {
-        String message = "Pacman Map Editor\n\n" +
-                        "버전: 1.0.0\n" +
-                        "개발: 디자인 패턴 수업 과제\n\n" +
-                        "56×63 그리드의 Pacman 맵을 생성하는 에디터입니다.\n" +
-                        "다양한 디자인 패턴이 적용되었습니다.";
-
-        JOptionPane.showMessageDialog(this, message, "정보",
-            JOptionPane.INFORMATION_MESSAGE);
+        // 콘솔에 정보 출력
+        System.out.println("\n=== Pacman Map Editor ===");
+        System.out.println("버전: 1.0.0");
+        System.out.println("개발: 디자인 패턴 수업 과제");
+        System.out.println("56×63 그리드의 Pacman 맵을 생성하는 에디터입니다.");
+        System.out.println("다양한 디자인 패턴이 적용되었습니다.\n");
     }
 
     /**
-     * 디자인 패턴 정보 다이얼로그
+     * 디자인 패턴 정보 출력
      */
     private void showDesignPatternsInfo() {
-        String patterns = "적용된 디자인 패턴:\n\n" +
-            "1. Observer Pattern\n" +
-            "   - MapData (Subject) ↔ UI Components (Observers)\n" +
-            "   - 맵 데이터 변경 시 자동 UI 업데이트\n\n" +
-            "2. State Pattern\n" +
-            "   - EditorState 인터페이스와 구현체들\n" +
-            "   - IdleState, PlacementState, EraseState\n" +
-            "   - 상태에 따른 마우스 이벤트 처리 변경\n\n" +
-            "3. Command Pattern\n" +
-            "   - PlaceEntityCommand, RemoveEntityCommand\n" +
-            "   - Undo/Redo 기능 구현\n" +
-            "   - CommandManager로 히스토리 관리\n\n" +
-            "4. Singleton Pattern\n" +
-            "   - MapEditorManager\n" +
-            "   - 전역 에디터 상태 관리\n\n" +
-            "5. MVC Pattern\n" +
-            "   - Model: MapData, EntityType\n" +
-            "   - View: UI Components (Panels)\n" +
-            "   - Controller: MapEditorManager, StateContext\n\n" +
-            "각 패턴이 서로 조화롭게 작동하여\n" +
-            "유지보수가 쉽고 확장 가능한 구조를 제공합니다.";
-
-        JTextArea textArea = new JTextArea(patterns);
-        textArea.setEditable(false);
-        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new Dimension(500, 400));
-
-        JOptionPane.showMessageDialog(this, scrollPane,
-            "적용된 디자인 패턴", JOptionPane.INFORMATION_MESSAGE);
+        // 콘솔에 디자인 패턴 정보 출력
+        System.out.println("\n=== 적용된 디자인 패턴 ===\n");
+        System.out.println("1. Observer Pattern");
+        System.out.println("   - MapData (Subject) ↔ UI Components (Observers)");
+        System.out.println("   - 맵 데이터 변경 시 자동 UI 업데이트\n");
+        System.out.println("2. State Pattern");
+        System.out.println("   - EditorState 인터페이스와 구현체들");
+        System.out.println("   - IdleState, PlacementState, EraseState");
+        System.out.println("   - 상태에 따른 마우스 이벤트 처리 변경\n");
+        System.out.println("3. Command Pattern");
+        System.out.println("   - PlaceEntityCommand, RemoveEntityCommand");
+        System.out.println("   - Undo/Redo 기능 구현");
+        System.out.println("   - CommandManager로 히스토리 관리\n");
+        System.out.println("4. Singleton Pattern");
+        System.out.println("   - MapEditorManager");
+        System.out.println("   - 전역 에디터 상태 관리\n");
+        System.out.println("5. MVC Pattern");
+        System.out.println("   - Model: MapData, EntityType");
+        System.out.println("   - View: UI Components (Panels)");
+        System.out.println("   - Controller: MapEditorManager, StateContext\n");
+        System.out.println("각 패턴이 서로 조화롭게 작동하여");
+        System.out.println("유지보수가 쉽고 확장 가능한 구조를 제공합니다.\n");
     }
 
     /**

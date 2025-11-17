@@ -23,7 +23,7 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
     private Map<EntityType, JLabel> statusIcons;
     private JButton saveButton;
     private JButton resetButton;
-    private JTextArea validationMessage;
+    // validationMessage 제거 - 모든 메시지는 콘솔로만 출력
 
     public EntityCounterPanel() {
         this.manager = MapEditorManager.getInstance();
@@ -85,19 +85,7 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
         add(separator);
         add(Box.createVerticalStrut(10));
 
-        // 검증 메시지 영역
-        validationMessage = new JTextArea(3, 15);
-        validationMessage.setEditable(false);
-        validationMessage.setWrapStyleWord(true);
-        validationMessage.setLineWrap(true);
-        validationMessage.setFont(new Font("Arial", Font.PLAIN, 11));
-        validationMessage.setBackground(new Color(255, 255, 230));
-        validationMessage.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        JScrollPane scrollPane = new JScrollPane(validationMessage);
-        scrollPane.setPreferredSize(new Dimension(180, 60));
-        add(scrollPane);
-        add(Box.createVerticalStrut(10));
+        // 검증 메시지 영역 제거 - 모든 메시지는 콘솔로만 출력
 
         // 버튼 패널
         JPanel buttonPanel = new JPanel();
@@ -180,11 +168,8 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
     private void handleSave() {
         // 필수 엔티티 검증
         if (!manager.validateMap()) {
-            // 부족한 엔티티 정보를 팝업으로 표시
-            JOptionPane.showMessageDialog(this,
-                manager.getValidationErrorMessage(),
-                "맵 저장 실패",
-                JOptionPane.ERROR_MESSAGE);
+            // 콘솔에만 오류 메시지 출력
+            System.err.println("맵 저장 실패: " + manager.getValidationErrorMessage());
             return;
         }
 
@@ -201,22 +186,17 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
             String nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.'));
             String imgPath = "src/resources/img/" + nameWithoutExt + "_bg.png";
 
-            JOptionPane.showMessageDialog(this,
-                "맵이 성공적으로 저장되었습니다!\n\n" +
-                "CSV 파일: " + csvPath + "\n" +
-                "배경 이미지: " + imgPath + "\n\n" +
-                "게임에서 이 맵을 사용하려면 Game.java에서\n" +
-                "\"level/" + fileName + "\"로 변경하세요.",
-                "저장 완료",
-                JOptionPane.INFORMATION_MESSAGE);
+            // 콘솔에만 저장 성공 메시지 출력
+            System.out.println("맵이 성공적으로 저장되었습니다!");
+            System.out.println("CSV 파일: " + csvPath);
+            System.out.println("배경 이미지: " + imgPath);
+            System.out.println("게임에서 이 맵을 사용하려면 Game.java에서 \"level/" + fileName + "\"로 변경하세요.");
 
             manager.setLastSavedFilePath(csvPath);
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                "맵 저장 중 오류가 발생했습니다:\n" + e.getMessage(),
-                "저장 실패",
-                JOptionPane.ERROR_MESSAGE);
+            // 콘솔에만 오류 메시지 출력
+            System.err.println("맵 저장 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
@@ -224,15 +204,10 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
      * 초기화 버튼 핸들러
      */
     private void handleReset() {
-        int result = JOptionPane.showConfirmDialog(this,
-            "정말 맵을 초기화하시겠습니까?\n모든 배치된 엔티티가 삭제됩니다.",
-            "초기화 확인",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE);
-
-        if (result == JOptionPane.YES_OPTION) {
-            manager.resetMap();
-        }
+        // 다이얼로그 없이 바로 초기화
+        manager.resetMap();
+        // 콘솔에만 초기화 메시지 출력
+        System.out.println("맵이 초기화되었습니다.");
     }
 
     /**
@@ -285,12 +260,11 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
         boolean isValid = manager.validateMap();
         saveButton.setEnabled(isValid);
 
+        // 검증 메시지는 콘솔로만 출력
         if (isValid) {
-            validationMessage.setText("✓ 맵을 저장할 준비가 완료되었습니다.");
-            validationMessage.setForeground(new Color(0, 150, 0));
+            System.out.println("✓ 맵을 저장할 준비가 완료되었습니다.");
         } else {
-            validationMessage.setText(manager.getValidationErrorMessage());
-            validationMessage.setForeground(Color.RED);
+            System.out.println("검증 실패: " + manager.getValidationErrorMessage());
         }
     }
 
