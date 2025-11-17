@@ -58,13 +58,8 @@ public class MapEditorFrame extends JFrame {
         // 상단 팔레트 패널
         palettePanel = new EntityPalettePanel();
 
-        // 중앙 그리드 패널
+        // 중앙 그리드 패널 (스크롤 없이 고정 크기)
         gridPanel = new MapGridPanel();
-        JScrollPane gridScrollPane = new JScrollPane(gridPanel);
-        gridScrollPane.setPreferredSize(new Dimension(
-            MapGridPanel.CELL_SIZE * mapeditor.model.MapData.WIDTH + 20,
-            MapGridPanel.CELL_SIZE * mapeditor.model.MapData.HEIGHT + 20
-        ));
 
         // 오른쪽 카운터 패널
         counterPanel = new EntityCounterPanel();
@@ -79,9 +74,9 @@ public class MapEditorFrame extends JFrame {
         // 상단 팔레트
         add(palettePanel, BorderLayout.NORTH);
 
-        // 중앙 영역 (그리드 + 카운터)
+        // 중앙 영역 (그리드 + 카운터) - 스크롤 없이 고정 크기
         JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.add(new JScrollPane(gridPanel), BorderLayout.CENTER);
+        centerPanel.add(gridPanel, BorderLayout.CENTER);
         centerPanel.add(counterPanel, BorderLayout.EAST);
         add(centerPanel, BorderLayout.CENTER);
 

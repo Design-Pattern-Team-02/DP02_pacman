@@ -50,7 +50,7 @@ public class EntityPalettePanel extends JPanel {
                 Color.WHITE
             )
         ));
-        setPreferredSize(new Dimension(0, 110));
+        setPreferredSize(new Dimension(0, 100));
         setBackground(new Color(45, 45, 45));
     }
 

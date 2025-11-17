@@ -109,7 +109,7 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
         buttonPanel.add(saveButton);
 
         // 초기화 버튼
-        resetButton = new JButton("초기화");
+        resetButton = new JButton("[RESET] 초기화");
         resetButton.setFont(new Font("Arial", Font.BOLD, 16));
         resetButton.setBackground(new Color(150, 50, 50));
         resetButton.setForeground(Color.WHITE);
