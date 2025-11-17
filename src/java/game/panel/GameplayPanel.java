@@ -30,6 +30,7 @@ public class GameplayPanel extends JPanel implements Runnable {
         setPreferredSize(new Dimension(width, height));
         setFocusable(true);
         requestFocus();
+        //"img/custom_map_001_bg.png"
         backgroundImage = ImageIO.read(getClass().getClassLoader().getResource("img/background.png"));
     }
 
@@ -45,7 +46,6 @@ public class GameplayPanel extends JPanel implements Runnable {
 
     //initialisation du jeu
     public void init() {
-
         running = true;
         img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         g = (Graphics2D) img.getGraphics();
@@ -73,16 +73,23 @@ public class GameplayPanel extends JPanel implements Runnable {
         }
     }
 
-    //Affichage du jeu : on affiche l'image avec le rendu
+    //Affichage du jeu : on affiche l'image avec le rendu (optimisé pour Mac)
+    @Override
+    protected void paintComponent(Graphics g2) {
+        super.paintComponent(g2);
+        if (img != null) {
+            g2.drawImage(img, 0, 0, width, height, null);
+        }
+    }
+
     public void draw() {
-        Graphics g2 = this.getGraphics();
-        g2.drawImage(img, 0, 0, width, height, null);
-        g2.dispose();
+        repaint();
     }
 
     @Override
     public void run() {
         init();
+
         //Pour faire en sorte que le jeu tourne à 60FPS (tutoriel consulté : https://www.youtube.com/watch?v=LhUN3EKZiio)
         final double GAME_HERTZ = 60.0;
         final double TBU = 1000000000 / GAME_HERTZ; //Time before update
