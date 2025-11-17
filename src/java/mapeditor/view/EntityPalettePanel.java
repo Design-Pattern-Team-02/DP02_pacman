@@ -108,7 +108,7 @@ public class EntityPalettePanel extends JPanel {
         toolPanel.setBackground(new Color(55, 55, 55));
 
         // 지우개 버튼
-        eraseButton = new JToggleButton("지우개") {
+        eraseButton = new JToggleButton("Eraser") {
             private Color baseColor = new Color(200, 200, 200);
 
             @Override
@@ -163,7 +163,7 @@ public class EntityPalettePanel extends JPanel {
         toolPanel.add(eraseButton);
 
         // Undo 버튼
-        JButton undoButton = new JButton("↶ Undo");
+        JButton undoButton = new JButton("Undo");
         undoButton.setPreferredSize(new Dimension(70, 40));
         undoButton.setBackground(new Color(80, 80, 80));
         undoButton.setForeground(Color.WHITE);
@@ -174,15 +174,17 @@ public class EntityPalettePanel extends JPanel {
             BorderFactory.createEmptyBorder(2, 2, 2, 2)
         ));
         undoButton.addActionListener(e -> {
+            System.out.println("Undo 버튼 클릭! canUndo: " + manager.canUndo());
             if (manager.canUndo()) {
-                manager.undo();
+                boolean success = manager.undo();
+                System.out.println("Undo 실행 결과: " + success);
                 updateButtonStates();
             }
         });
         toolPanel.add(undoButton);
 
         // Redo 버튼
-        JButton redoButton = new JButton("↷ Redo");
+        JButton redoButton = new JButton("Redo");
         redoButton.setPreferredSize(new Dimension(70, 40));
         redoButton.setBackground(new Color(80, 80, 80));
         redoButton.setForeground(Color.WHITE);
@@ -193,8 +195,10 @@ public class EntityPalettePanel extends JPanel {
             BorderFactory.createEmptyBorder(2, 2, 2, 2)
         ));
         redoButton.addActionListener(e -> {
+            System.out.println("Redo 버튼 클릭! canRedo: " + manager.canRedo());
             if (manager.canRedo()) {
-                manager.redo();
+                boolean success = manager.redo();
+                System.out.println("Redo 실행 결과: " + success);
                 updateButtonStates();
             }
         });

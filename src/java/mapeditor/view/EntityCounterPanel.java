@@ -259,13 +259,6 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
     private void updateValidationState() {
         boolean isValid = manager.validateMap();
         saveButton.setEnabled(isValid);
-
-        // 검증 메시지는 콘솔로만 출력
-        if (isValid) {
-            System.out.println("✓ 맵을 저장할 준비가 완료되었습니다.");
-        } else {
-            System.out.println("검증 실패: " + manager.getValidationErrorMessage());
-        }
     }
 
     // ========== MapObserver 인터페이스 구현 ==========

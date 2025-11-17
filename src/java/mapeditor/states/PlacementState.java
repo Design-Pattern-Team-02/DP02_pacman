@@ -48,9 +48,9 @@ public class PlacementState implements EditorState {
 
         if (button == MouseEvent.BUTTON1) { // 좌클릭
             if (canPlaceAtCurrentPosition) {
-                // Command Pattern을 위한 준비
-                // 현재는 직접 배치, 나중에 Command로 래핑 예정
-                boolean placed = mapData.placeEntity(gridX, gridY, selectedEntityType);
+                // Mediator Pattern을 통한 Command 실행
+                // Context가 MapEditorManager의 Command Pattern 실행을 중재
+                boolean placed = context.requestPlaceEntity(gridX, gridY, selectedEntityType);
 
                 if (placed && selectedEntityType.isRequired() &&
                     mapData.getEntityCount(selectedEntityType) >= selectedEntityType.getMaxCount()) {
