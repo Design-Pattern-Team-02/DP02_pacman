@@ -52,7 +52,7 @@ public class CsvMapWriter {
             parentDir.mkdirs();
         }
 
-        // 논리적 그리드를 CSV 크기로 확장 (56×62)
+        // 논리적 그리드를 CSV 크기로 확장 (56×60)
         EntityType[][] expandedData = expandMapData(mapData);
 
         // CSV 파일 작성
@@ -68,7 +68,7 @@ public class CsvMapWriter {
     }
 
     /**
-     * 논리적 그리드(28×31)를 CSV 그리드(56×62)로 확장
+     * 논리적 그리드(14×15)를 CSV 그리드(56×60)로 확장
      */
     private static EntityType[][] expandMapData(EntityType[][] logicalGrid) {
         int logicalHeight = logicalGrid.length;
@@ -83,19 +83,19 @@ public class CsvMapWriter {
             }
         }
 
-        // 각 논리적 칸을 2×2로 확장
+        // 각 논리적 칸을 4×4로 확장
         for (int logicalY = 0; logicalY < logicalHeight && logicalY < MapData.HEIGHT; logicalY++) {
             for (int logicalX = 0; logicalX < logicalWidth && logicalX < MapData.WIDTH; logicalX++) {
                 EntityType entity = logicalGrid[logicalY][logicalX];
 
-                int csvX = logicalX * 2;
-                int csvY = logicalY * 2;
+                int csvX = logicalX * 4;
+                int csvY = logicalY * 4;
 
                 if (csvY < MapData.CSV_HEIGHT && csvX < MapData.CSV_WIDTH) {
-                    // 벽은 2×2 전체를 채움
+                    // 벽은 4×4 전체를 채움
                     if (entity == EntityType.WALL || entity == EntityType.GHOST_HOUSE_WALL) {
-                        for (int dy = 0; dy < 2 && csvY + dy < MapData.CSV_HEIGHT; dy++) {
-                            for (int dx = 0; dx < 2 && csvX + dx < MapData.CSV_WIDTH; dx++) {
+                        for (int dy = 0; dy < 4 && csvY + dy < MapData.CSV_HEIGHT; dy++) {
+                            for (int dx = 0; dx < 4 && csvX + dx < MapData.CSV_WIDTH; dx++) {
                                 expanded[csvY + dy][csvX + dx] = entity;
                             }
                         }

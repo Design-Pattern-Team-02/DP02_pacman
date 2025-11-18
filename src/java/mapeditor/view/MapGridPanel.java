@@ -24,7 +24,7 @@ import java.util.Map;
  * - State Pattern과 연동하여 마우스 이벤트 처리
  */
 public class MapGridPanel extends JPanel implements MapObserver {
-    public static final int CELL_SIZE = 20; // 셀 크기
+    public static final int CELL_SIZE = 40; // 셀 크기 (14×15 그리드 기준)
     private static final Color GRID_COLOR = new Color(80, 80, 80, 150);  // 더 부드러운 그리드
     private static final Color BACKGROUND_COLOR = Color.BLACK;
 

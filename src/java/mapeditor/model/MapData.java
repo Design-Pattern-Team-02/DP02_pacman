@@ -14,16 +14,16 @@ import java.util.*;
  */
 public class MapData {
     // 논리적 그리드 크기 (맵 에디터에서 사용)
-    public static final int WIDTH = 28;
-    public static final int HEIGHT = 31;
+    public static final int WIDTH = 14;
+    public static final int HEIGHT = 15;
 
     // 실제 CSV 크기 (4x4 확장)
-    public static final int CSV_WIDTH = 56;  // WIDTH * 2
-    public static final int CSV_HEIGHT = 62; // HEIGHT * 2 (원래 게임은 62줄)
+    public static final int CSV_WIDTH = 56;  // WIDTH * 4
+    public static final int CSV_HEIGHT = 60; // HEIGHT * 4
 
     // 고스트 집 위치와 크기 (중앙에 배치)
-    private static final int GHOST_HOUSE_X = 11;  // 중앙 X 좌표
-    private static final int GHOST_HOUSE_Y = 14;  // 중앙 Y 좌표
+    private static final int GHOST_HOUSE_X = 5;  // 중앙 X 좌표 (14칸 기준)
+    private static final int GHOST_HOUSE_Y = 6;  // 중앙 Y 좌표 (15칸 기준)
     private static final int GHOST_HOUSE_WIDTH = 5;
     private static final int GHOST_HOUSE_HEIGHT = 3;
 
@@ -300,8 +300,8 @@ public class MapData {
 
     /**
      * 논리적 그리드를 실제 CSV 크기로 확장 (4x4 확장)
-     * 28×31 → 56×62
-     * 각 논리적 칸을 2×2로 확장하고, 좌측 상단에만 엔티티 표기
+     * 14×15 → 56×60
+     * 각 논리적 칸을 4×4로 확장하고, 벽은 4×4 전체 채우고 다른 엔티티는 좌측 상단에만 표기
      */
     public EntityType[][] getExpandedGridForCSV() {
         EntityType[][] expanded = new EntityType[CSV_HEIGHT][CSV_WIDTH];
@@ -313,22 +313,22 @@ public class MapData {
             }
         }
 
-        // 논리적 그리드의 각 칸을 2×2로 확장
+        // 논리적 그리드의 각 칸을 4×4로 확장
         // 엔티티는 좌측 상단(0,0)에만 배치
         for (int logicalY = 0; logicalY < HEIGHT; logicalY++) {
             for (int logicalX = 0; logicalX < WIDTH; logicalX++) {
                 EntityType entity = grid[logicalY][logicalX];
 
-                // CSV 좌표 계산 (2배 확장)
-                int csvX = logicalX * 2;
-                int csvY = logicalY * 2;
+                // CSV 좌표 계산 (4배 확장)
+                int csvX = logicalX * 4;
+                int csvY = logicalY * 4;
 
                 // 범위 체크
                 if (csvY < CSV_HEIGHT && csvX < CSV_WIDTH) {
-                    // 벽의 경우 2×2 전체를 채움
+                    // 벽의 경우 4×4 전체를 채움
                     if (entity == EntityType.WALL || entity == EntityType.GHOST_HOUSE_WALL) {
-                        for (int dy = 0; dy < 2 && csvY + dy < CSV_HEIGHT; dy++) {
-                            for (int dx = 0; dx < 2 && csvX + dx < CSV_WIDTH; dx++) {
+                        for (int dy = 0; dy < 4 && csvY + dy < CSV_HEIGHT; dy++) {
+                            for (int dx = 0; dx < 4 && csvX + dx < CSV_WIDTH; dx++) {
                                 expanded[csvY + dy][csvX + dx] = entity;
                             }
                         }
