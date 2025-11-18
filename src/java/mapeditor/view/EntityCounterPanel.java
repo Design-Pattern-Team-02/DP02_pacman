@@ -168,8 +168,13 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
     private void handleSave() {
         // 필수 엔티티 검증
         if (!manager.validateMap()) {
-            // 콘솔에만 오류 메시지 출력
-            System.err.println("맵 저장 실패: " + manager.getValidationErrorMessage());
+            String errorMessage = manager.getValidationErrorMessage();
+            javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "맵 저장 실패!\n\n" + errorMessage,
+                "저장 오류",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+            );
             return;
         }
 
@@ -178,7 +183,7 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
 
         // CSV 파일과 배경 이미지로 저장
         try {
-            EntityType[][] mapData = manager.getMapDataCopy(); // 논리적 28×31 그리드
+            EntityType[][] mapData = manager.getMapDataCopy();
             String csvPath = mapeditor.utils.CsvMapWriter.saveMap(mapData, null);
 
             // 이미지 경로 계산
@@ -186,17 +191,42 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
             String nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.'));
             String imgPath = "src/resources/img/" + nameWithoutExt + "_bg.png";
 
-            // 콘솔에만 저장 성공 메시지 출력
-            System.out.println("맵이 성공적으로 저장되었습니다!");
-            System.out.println("CSV 파일: " + csvPath);
-            System.out.println("배경 이미지: " + imgPath);
-            System.out.println("게임에서 이 맵을 사용하려면 Game.java에서 \"level/" + fileName + "\"로 변경하세요.");
+            // 절대 경로로 변환
+            java.io.File csvFile = new java.io.File(csvPath);
+            java.io.File imgFile = new java.io.File(imgPath);
+            String csvAbsolutePath = csvFile.getAbsolutePath();
+            String imgAbsolutePath = imgFile.getAbsolutePath();
 
             manager.setLastSavedFilePath(csvPath);
 
+            // 저장 완료 다이얼로그 표시
+            String message = String.format(
+                "저장완료!\n\n" +
+                "CSV 파일:\n%s\n\n" +
+                "PNG 파일:\n%s",
+                csvAbsolutePath,
+                imgAbsolutePath
+            );
+
+            javax.swing.JOptionPane.showMessageDialog(
+                this,
+                message,
+                "저장 완료",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE
+            );
+
+            // 프로그램 종료
+            System.exit(0);
+
         } catch (Exception e) {
-            // 콘솔에만 오류 메시지 출력
-            System.err.println("맵 저장 중 오류가 발생했습니다: " + e.getMessage());
+            javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "맵 저장 중 오류가 발생했습니다!\n\n" +
+                "오류 메시지: " + e.getMessage(),
+                "저장 오류",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+            );
+            e.printStackTrace();
         }
     }
 
