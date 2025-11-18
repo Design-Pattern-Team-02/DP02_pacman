@@ -107,10 +107,14 @@ public class MapData {
         grid[startY + 2][startX + 3] = EntityType.WALL;
         grid[startY + 2][startX + 4] = EntityType.WALL;
 
-        // 고스트 집 영역을 편집 불가능으로 설정
+        // 고스트 집의 벽과 문만 편집 불가능으로 설정 (빈 공간은 편집 가능)
         for (int y = 0; y < GHOST_HOUSE_HEIGHT; y++) {
             for (int x = 0; x < GHOST_HOUSE_WIDTH; x++) {
-                editableGrid[startY + y][startX + x] = false;
+                EntityType cellType = grid[startY + y][startX + x];
+                // 벽이나 고스트 하우스 문인 경우만 편집 불가
+                if (cellType == EntityType.WALL || cellType == EntityType.GHOST_HOUSE_WALL) {
+                    editableGrid[startY + y][startX + x] = false;
+                }
             }
         }
     }
@@ -351,12 +355,13 @@ public class MapData {
     }
 
     /**
-     * 모든 빈 공간을 PacGum으로 채우기
+     * 모든 빈 공간을 PacGum으로 채우기 (고스트 하우스 내부 제외)
      */
     public void fillEmptyWithPacGum() {
         for (int y = 0; y < HEIGHT; y++) {
             for (int x = 0; x < WIDTH; x++) {
-                if (grid[y][x] == EntityType.EMPTY) {
+                // 빈 공간이고, 고스트 하우스 영역이 아닌 경우만 팩검 배치
+                if (grid[y][x] == EntityType.EMPTY && !isGhostHouseArea(x, y)) {
                     grid[y][x] = EntityType.PAC_GUM;
                     incrementEntityCount(EntityType.PAC_GUM);
                     decrementEntityCount(EntityType.EMPTY);
