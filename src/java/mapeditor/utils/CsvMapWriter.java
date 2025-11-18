@@ -100,7 +100,13 @@ public class CsvMapWriter {
                             }
                         }
                     }
-                    // 다른 엔티티는 좌측 상단에만 배치
+                    // 팩검/슈퍼팩검은 4×4 블록의 (1,1) 위치에 배치
+                    else if (entity == EntityType.PAC_GUM || entity == EntityType.SUPER_PAC_GUM) {
+                        if (csvY + 1 < MapData.CSV_HEIGHT && csvX + 1 < MapData.CSV_WIDTH) {
+                            expanded[csvY + 1][csvX + 1] = entity;
+                        }
+                    }
+                    // 다른 엔티티(팩맨, 유령)는 좌측 상단에만 배치
                     else if (entity != EntityType.EMPTY) {
                         expanded[csvY][csvX] = entity;
                     }
