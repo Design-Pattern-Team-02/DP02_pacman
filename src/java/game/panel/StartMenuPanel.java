@@ -93,7 +93,22 @@ public class StartMenuPanel extends JPanel {
         });
 
         mapEditorButton.addActionListener((ActionEvent e) -> {
-            JOptionPane.showMessageDialog(parent, "Map Editor not implemented yet.", "Map Editor", JOptionPane.INFORMATION_MESSAGE);
+            //          execute map editor in a separate process
+            try {
+                ProcessBuilder pb = new ProcessBuilder(
+                        "java",
+                        "-cp",
+                        System.getProperty("java.class.path"),
+                        "mapeditor.MapEditorLauncher"
+                );
+
+                Process process = pb.start();
+                int exitCode = process.waitFor();
+                System.out.println("Exit code: " + exitCode);
+
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
         });
 
         return panel;
