@@ -149,8 +149,7 @@ public class MapGridPanel extends JPanel implements MapObserver {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                // 드래그를 통한 연속 배치 (선택적 구현)
-                // 현재는 클릭 방식만 지원
+                handleMouseDrag(e);
             }
         });
     }
@@ -175,6 +174,21 @@ public class MapGridPanel extends JPanel implements MapObserver {
         if (isValidGridPosition(gridPos)) {
             currentMouseGridPosition = gridPos;
             manager.getStateContext().handleMouseMove(gridPos.x, gridPos.y);
+        } else {
+            currentMouseGridPosition = null;
+            manager.getStateContext().handleMouseExit();
+        }
+        repaint();
+    }
+
+    /**
+     * 마우스 드래그 처리
+     */
+    private void handleMouseDrag(MouseEvent e) {
+        Point gridPos = screenToGrid(e.getPoint());
+        if (isValidGridPosition(gridPos)) {
+            currentMouseGridPosition = gridPos;
+            manager.getStateContext().handleMouseDrag(gridPos.x, gridPos.y);
         } else {
             currentMouseGridPosition = null;
             manager.getStateContext().handleMouseExit();

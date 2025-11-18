@@ -36,6 +36,11 @@ public class IdleState implements EditorState {
     }
 
     @Override
+    public void handleMouseDrag(int gridX, int gridY) {
+        // Idle 상태에서는 드래그해도 아무 동작 없음
+    }
+
+    @Override
     public void handleMouseExit() {
         currentGridPosition = null;
     }

@@ -103,6 +103,10 @@ public class EditorStateContext {
         currentState.handleMouseMove(gridX, gridY);
     }
 
+    public void handleMouseDrag(int gridX, int gridY) {
+        currentState.handleMouseDrag(gridX, gridY);
+    }
+
     public void handleMouseExit() {
         currentState.handleMouseExit();
     }

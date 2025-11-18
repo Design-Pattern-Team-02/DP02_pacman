@@ -58,6 +58,11 @@ public class EraseState implements EditorState {
     }
 
     @Override
+    public void handleMouseDrag(int gridX, int gridY) {
+        // EraseState에서는 드래그 삭제 지원 안함 (필요시 구현 가능)
+    }
+
+    @Override
     public void handleMouseExit() {
         currentGridPosition = null;
         canEraseAtCurrentPosition = false;

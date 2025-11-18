@@ -96,6 +96,33 @@ public class PlacementState implements EditorState {
     }
 
     @Override
+    public void handleMouseDrag(int gridX, int gridY) {
+        // 벽(WALL)만 드래그로 배치 가능
+        if (selectedEntityType != EntityType.WALL) {
+            return;
+        }
+
+        // 현재 위치 업데이트
+        currentGridPosition = new Point(gridX, gridY);
+
+        // 편집 불가능한 영역 체크 (고스트 집)
+        if (!mapData.isEditable(gridX, gridY)) {
+            canPlaceAtCurrentPosition = false;
+            return;
+        }
+
+        // 현재 위치에 배치 가능한지 확인
+        EntityType currentEntity = mapData.getEntityAt(gridX, gridY);
+        if (currentEntity == EntityType.EMPTY) {
+            // 배치 가능한 경우 즉시 배치
+            canPlaceAtCurrentPosition = true;
+            context.requestPlaceEntity(gridX, gridY, selectedEntityType);
+        } else {
+            canPlaceAtCurrentPosition = false;
+        }
+    }
+
+    @Override
     public void handleMouseExit() {
         currentGridPosition = null;
         canPlaceAtCurrentPosition = false;
