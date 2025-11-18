@@ -68,7 +68,8 @@ public class CsvMapWriter {
     }
 
     /**
-     * 논리적 그리드(14×15)를 CSV 그리드(56×60)로 확장
+     * 논리적 그리드(14×15)를 CSV 그리드(56×62)로 확장
+     * 하단 2행(60-61)을 벽으로 채움
      */
     private static EntityType[][] expandMapData(EntityType[][] logicalGrid) {
         int logicalHeight = logicalGrid.length;
@@ -111,6 +112,13 @@ public class CsvMapWriter {
                         expanded[csvY][csvX] = entity;
                     }
                 }
+            }
+        }
+
+        // 하단 2행(60-61)을 벽으로 채움 (level.csv와 크기 일치)
+        for (int y = 60; y < 62; y++) {
+            for (int x = 0; x < MapData.CSV_WIDTH; x++) {
+                expanded[y][x] = EntityType.WALL;
             }
         }
 

@@ -17,9 +17,9 @@ public class MapData {
     public static final int WIDTH = 14;
     public static final int HEIGHT = 15;
 
-    // 실제 CSV 크기 (4x4 확장)
+    // 실제 CSV 크기 (4x4 확장 + 하단 2행 추가)
     public static final int CSV_WIDTH = 56;  // WIDTH * 4
-    public static final int CSV_HEIGHT = 60; // HEIGHT * 4
+    public static final int CSV_HEIGHT = 62; // HEIGHT * 4 + 2 (하단 벽 2행 추가)
 
     // 고스트 집 위치와 크기 (중앙에 배치)
     private static final int GHOST_HOUSE_X = 5;  // 중앙 X 좌표 (14칸 기준)
@@ -304,8 +304,9 @@ public class MapData {
 
     /**
      * 논리적 그리드를 실제 CSV 크기로 확장 (4x4 확장)
-     * 14×15 → 56×60
+     * 14×15 → 56×62
      * 각 논리적 칸을 4×4로 확장하고, 벽은 4×4 전체 채우고 다른 엔티티는 좌측 상단에만 표기
+     * 하단 2행(60-61)을 벽으로 채움
      */
     public EntityType[][] getExpandedGridForCSV() {
         EntityType[][] expanded = new EntityType[CSV_HEIGHT][CSV_WIDTH];
@@ -348,6 +349,13 @@ public class MapData {
                         expanded[csvY][csvX] = entity;
                     }
                 }
+            }
+        }
+
+        // 하단 2행(60-61)을 벽으로 채움 (level.csv와 크기 일치)
+        for (int y = 60; y < 62; y++) {
+            for (int x = 0; x < CSV_WIDTH; x++) {
+                expanded[y][x] = EntityType.WALL;
             }
         }
 
