@@ -7,15 +7,15 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 
 /**
- * EditorStateContext - State Pattern Context + Mediator
+ * EditorStateContext - State Pattern Context
  * 에디터의 현재 상태를 관리하고 상태 전환을 담당
  * State와 MapEditorManager 간의 통신을 중재
  *
  * 디자인 패턴 적용:
  * - State Pattern의 Context 역할
- * - Mediator Pattern: State와 Command 실행 간의 중재
  * - 클라이언트는 이 Context를 통해 상태와 상호작용
  * - 상태 전환 로직을 중앙화하여 관리
+ * - State가 Manager를 직접 참조하지 않도록 간접 참조 제공
  */
 public class EditorStateContext {
     private EditorState currentState;
@@ -128,7 +128,7 @@ public class EditorStateContext {
     }
 
     /**
-     * Mediator Pattern - 엔티티 배치 요청을 중재
+     * 엔티티 배치 요청
      * State가 요청하면 MapEditorManager의 Command를 실행
      * @param x x 좌표
      * @param y y 좌표
@@ -141,7 +141,7 @@ public class EditorStateContext {
     }
 
     /**
-     * Mediator Pattern - 엔티티 제거 요청을 중재
+     * 엔티티 제거 요청
      * State가 요청하면 MapEditorManager의 Command를 실행
      * @param x x 좌표
      * @param y y 좌표
