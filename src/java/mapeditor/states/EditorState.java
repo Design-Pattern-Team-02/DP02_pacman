@@ -32,6 +32,13 @@ public interface EditorState {
     void handleMouseMove(int gridX, int gridY);
 
     /**
+     * 마우스 드래그 이벤트 처리 (클릭 + 드래그)
+     * @param gridX 그리드 x 좌표
+     * @param gridY 그리드 y 좌표
+     */
+    void handleMouseDrag(int gridX, int gridY);
+
+    /**
      * 마우스가 그리드를 벗어났을 때 처리
      */
     void handleMouseExit();

@@ -23,7 +23,7 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
     private Map<EntityType, JLabel> statusIcons;
     private JButton saveButton;
     private JButton resetButton;
-    private JTextArea validationMessage;
+    // validationMessage 제거 - 모든 메시지는 콘솔로만 출력
 
     public EntityCounterPanel() {
         this.manager = MapEditorManager.getInstance();
@@ -85,19 +85,7 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
         add(separator);
         add(Box.createVerticalStrut(10));
 
-        // 검증 메시지 영역
-        validationMessage = new JTextArea(3, 15);
-        validationMessage.setEditable(false);
-        validationMessage.setWrapStyleWord(true);
-        validationMessage.setLineWrap(true);
-        validationMessage.setFont(new Font("Arial", Font.PLAIN, 11));
-        validationMessage.setBackground(new Color(255, 255, 230));
-        validationMessage.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        JScrollPane scrollPane = new JScrollPane(validationMessage);
-        scrollPane.setPreferredSize(new Dimension(180, 60));
-        add(scrollPane);
-        add(Box.createVerticalStrut(10));
+        // 검증 메시지 영역 제거 - 모든 메시지는 콘솔로만 출력
 
         // 버튼 패널
         JPanel buttonPanel = new JPanel();
@@ -121,7 +109,7 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
         buttonPanel.add(saveButton);
 
         // 초기화 버튼
-        resetButton = new JButton("초기화");
+        resetButton = new JButton("[RESET] 초기화");
         resetButton.setFont(new Font("Arial", Font.BOLD, 16));
         resetButton.setBackground(new Color(150, 50, 50));
         resetButton.setForeground(Color.WHITE);
@@ -180,11 +168,13 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
     private void handleSave() {
         // 필수 엔티티 검증
         if (!manager.validateMap()) {
-            // 부족한 엔티티 정보를 팝업으로 표시
-            JOptionPane.showMessageDialog(this,
-                manager.getValidationErrorMessage(),
-                "맵 저장 실패",
-                JOptionPane.ERROR_MESSAGE);
+            String errorMessage = manager.getValidationErrorMessage();
+            javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "맵 저장 실패!\n\n" + errorMessage,
+                "저장 오류",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+            );
             return;
         }
 
@@ -193,7 +183,7 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
 
         // CSV 파일과 배경 이미지로 저장
         try {
-            EntityType[][] mapData = manager.getMapDataCopy(); // 논리적 28×31 그리드
+            EntityType[][] mapData = manager.getMapDataCopy();
             String csvPath = mapeditor.utils.CsvMapWriter.saveMap(mapData, null);
 
             // 이미지 경로 계산
@@ -201,22 +191,42 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
             String nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.'));
             String imgPath = "src/resources/img/" + nameWithoutExt + "_bg.png";
 
-            JOptionPane.showMessageDialog(this,
-                "맵이 성공적으로 저장되었습니다!\n\n" +
-                "CSV 파일: " + csvPath + "\n" +
-                "배경 이미지: " + imgPath + "\n\n" +
-                "게임에서 이 맵을 사용하려면 Game.java에서\n" +
-                "\"level/" + fileName + "\"로 변경하세요.",
-                "저장 완료",
-                JOptionPane.INFORMATION_MESSAGE);
+            // 절대 경로로 변환
+            java.io.File csvFile = new java.io.File(csvPath);
+            java.io.File imgFile = new java.io.File(imgPath);
+            String csvAbsolutePath = csvFile.getAbsolutePath();
+            String imgAbsolutePath = imgFile.getAbsolutePath();
 
             manager.setLastSavedFilePath(csvPath);
 
+            // 저장 완료 다이얼로그 표시
+            String message = String.format(
+                "저장완료!\n\n" +
+                "CSV 파일:\n%s\n\n" +
+                "PNG 파일:\n%s",
+                csvAbsolutePath,
+                imgAbsolutePath
+            );
+
+            javax.swing.JOptionPane.showMessageDialog(
+                this,
+                message,
+                "저장 완료",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE
+            );
+
+            // 프로그램 종료
+            System.exit(0);
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                "맵 저장 중 오류가 발생했습니다:\n" + e.getMessage(),
-                "저장 실패",
-                JOptionPane.ERROR_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "맵 저장 중 오류가 발생했습니다!\n\n" +
+                "오류 메시지: " + e.getMessage(),
+                "저장 오류",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+            );
+            e.printStackTrace();
         }
     }
 
@@ -224,15 +234,10 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
      * 초기화 버튼 핸들러
      */
     private void handleReset() {
-        int result = JOptionPane.showConfirmDialog(this,
-            "정말 맵을 초기화하시겠습니까?\n모든 배치된 엔티티가 삭제됩니다.",
-            "초기화 확인",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE);
-
-        if (result == JOptionPane.YES_OPTION) {
-            manager.resetMap();
-        }
+        // 다이얼로그 없이 바로 초기화
+        manager.resetMap();
+        // 콘솔에만 초기화 메시지 출력
+        System.out.println("맵이 초기화되었습니다.");
     }
 
     /**
@@ -284,14 +289,6 @@ public class EntityCounterPanel extends JPanel implements MapObserver {
     private void updateValidationState() {
         boolean isValid = manager.validateMap();
         saveButton.setEnabled(isValid);
-
-        if (isValid) {
-            validationMessage.setText("✓ 맵을 저장할 준비가 완료되었습니다.");
-            validationMessage.setForeground(new Color(0, 150, 0));
-        } else {
-            validationMessage.setText(manager.getValidationErrorMessage());
-            validationMessage.setForeground(Color.RED);
-        }
     }
 
     // ========== MapObserver 인터페이스 구현 ==========

@@ -24,7 +24,7 @@ import java.util.Map;
  * - State Pattern과 연동하여 마우스 이벤트 처리
  */
 public class MapGridPanel extends JPanel implements MapObserver {
-    public static final int CELL_SIZE = 24; // 더 큰 셀 크기로 시각성 향상
+    public static final int CELL_SIZE = 40; // 셀 크기 (14×15 그리드 기준)
     private static final Color GRID_COLOR = new Color(80, 80, 80, 150);  // 더 부드러운 그리드
     private static final Color BACKGROUND_COLOR = Color.BLACK;
 
@@ -54,9 +54,10 @@ public class MapGridPanel extends JPanel implements MapObserver {
      * 패널 초기화
      */
     private void initializePanel() {
+        // 테두리 포함한 크기 설정 (테두리: 외부 3px + 내부 2px = 총 10px 여유)
         setPreferredSize(new Dimension(
-            MapData.WIDTH * CELL_SIZE,
-            MapData.HEIGHT * CELL_SIZE
+            MapData.WIDTH * CELL_SIZE + 5,
+            MapData.HEIGHT * CELL_SIZE + 20
         ));
         setBackground(BACKGROUND_COLOR);
         setBorder(BorderFactory.createCompoundBorder(
@@ -148,8 +149,7 @@ public class MapGridPanel extends JPanel implements MapObserver {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                // 드래그를 통한 연속 배치 (선택적 구현)
-                // 현재는 클릭 방식만 지원
+                handleMouseDrag(e);
             }
         });
     }
@@ -174,6 +174,21 @@ public class MapGridPanel extends JPanel implements MapObserver {
         if (isValidGridPosition(gridPos)) {
             currentMouseGridPosition = gridPos;
             manager.getStateContext().handleMouseMove(gridPos.x, gridPos.y);
+        } else {
+            currentMouseGridPosition = null;
+            manager.getStateContext().handleMouseExit();
+        }
+        repaint();
+    }
+
+    /**
+     * 마우스 드래그 처리
+     */
+    private void handleMouseDrag(MouseEvent e) {
+        Point gridPos = screenToGrid(e.getPoint());
+        if (isValidGridPosition(gridPos)) {
+            currentMouseGridPosition = gridPos;
+            manager.getStateContext().handleMouseDrag(gridPos.x, gridPos.y);
         } else {
             currentMouseGridPosition = null;
             manager.getStateContext().handleMouseExit();

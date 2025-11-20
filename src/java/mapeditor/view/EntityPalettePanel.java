@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +24,6 @@ public class EntityPalettePanel extends JPanel {
     private Map<EntityType, JToggleButton> entityButtons;
     private ButtonGroup buttonGroup;
     private JToggleButton eraseButton;
-    private JButton cancelButton;
 
     public EntityPalettePanel() {
         this.manager = MapEditorManager.getInstance();
@@ -37,7 +38,7 @@ public class EntityPalettePanel extends JPanel {
      * 패널 초기화
      */
     private void initializePanel() {
-        setLayout(new FlowLayout(FlowLayout.LEFT, 8, 8));
+        setLayout(new FlowLayout(FlowLayout.CENTER, 8, 5));
         setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createEmptyBorder(5, 5, 5, 5),
             BorderFactory.createTitledBorder(
@@ -49,7 +50,7 @@ public class EntityPalettePanel extends JPanel {
                 Color.WHITE
             )
         ));
-        setPreferredSize(new Dimension(0, 110));
+        setPreferredSize(new Dimension(0, 100));
         setBackground(new Color(45, 45, 45));
     }
 
@@ -58,11 +59,11 @@ public class EntityPalettePanel extends JPanel {
      */
     private void createButtons() {
         // 필수 엔티티 그룹
-        JPanel requiredPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 3));
+        JPanel requiredPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 3, 3));
         requiredPanel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(255, 200, 100), 1),
             "★ 필수 엔티티",
-            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+            javax.swing.border.TitledBorder.CENTER,
             javax.swing.border.TitledBorder.DEFAULT_POSITION,
             new Font("Arial", Font.BOLD, 12),
             Color.WHITE
@@ -78,11 +79,11 @@ public class EntityPalettePanel extends JPanel {
         add(requiredPanel);
 
         // 자유 배치 엔티티 그룹
-        JPanel freePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 3));
+        JPanel freePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 3, 3));
         freePanel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(100, 200, 255), 1),
             "◆ 자유 배치",
-            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+            javax.swing.border.TitledBorder.CENTER,
             javax.swing.border.TitledBorder.DEFAULT_POSITION,
             new Font("Arial", Font.BOLD, 12),
             Color.WHITE
@@ -95,19 +96,19 @@ public class EntityPalettePanel extends JPanel {
         add(freePanel);
 
         // 도구 그룹
-        JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 3));
+        JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 3, 3));
         toolPanel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(255, 100, 100), 1),
             "▶ 도구",
-            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+            javax.swing.border.TitledBorder.CENTER,
             javax.swing.border.TitledBorder.DEFAULT_POSITION,
             new Font("Arial", Font.BOLD, 12),
-            new Color(255, 100, 100)
+            Color.WHITE
         ));
         toolPanel.setBackground(new Color(55, 55, 55));
 
         // 지우개 버튼
-        eraseButton = new JToggleButton("지우개") {
+        eraseButton = new JToggleButton("Eraser") {
             private Color baseColor = new Color(200, 200, 200);
 
             @Override
@@ -129,9 +130,9 @@ public class EntityPalettePanel extends JPanel {
                 }
             }
         };
-        eraseButton.setPreferredSize(new Dimension(80, 40));
+        eraseButton.setPreferredSize(new Dimension(70, 40));
         eraseButton.setBackground(new Color(200, 200, 200));
-        eraseButton.setForeground(Color.BLACK);
+        eraseButton.setForeground(Color.WHITE);
         eraseButton.setFont(new Font("Arial", Font.BOLD, 12));
         eraseButton.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(Color.DARK_GRAY, 2),
@@ -144,70 +145,66 @@ public class EntityPalettePanel extends JPanel {
                 clearOtherSelections(eraseButton);
             }
         });
+        // 포커스 리스너 추가 - 키보드 방향키 이동 시 선택 상태 업데이트
+        eraseButton.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                // 포커스를 받을 때 다른 버튼들의 선택 해제
+                clearOtherSelections(null);
+                updateButtonStates();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                // 포커스를 잃을 때 처리 (필요시)
+            }
+        });
         buttonGroup.add(eraseButton);
         toolPanel.add(eraseButton);
 
-        // 취소 버튼
-        cancelButton = new JButton("X (취소)");
-        cancelButton.setPreferredSize(new Dimension(80, 40));
-        cancelButton.setBackground(new Color(200, 200, 200));
-        cancelButton.setForeground(Color.BLACK);
-        cancelButton.setFont(new Font("Arial", Font.BOLD, 12));
-        cancelButton.setBorder(BorderFactory.createCompoundBorder(
+        // Undo 버튼
+        JButton undoButton = new JButton("Undo");
+        undoButton.setPreferredSize(new Dimension(70, 40));
+        undoButton.setBackground(new Color(80, 80, 80));
+        undoButton.setForeground(Color.WHITE);
+        undoButton.setFont(new Font("Arial", Font.BOLD, 12));
+        undoButton.setFocusPainted(false);
+        undoButton.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(Color.DARK_GRAY, 2),
             BorderFactory.createEmptyBorder(2, 2, 2, 2)
         ));
-        cancelButton.setFocusPainted(false);
-        cancelButton.addActionListener(e -> {
-            buttonGroup.clearSelection();
-            manager.cancelSelection();
-            updateButtonStates();
-        });
-        toolPanel.add(cancelButton);
-
-        add(toolPanel);
-
-        // Undo/Redo 버튼 그룹
-        JPanel undoRedoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 3));
-        undoRedoPanel.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(new Color(200, 100, 255), 1),
-            "◀ 편집",
-            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
-            javax.swing.border.TitledBorder.DEFAULT_POSITION,
-            new Font("Arial", Font.BOLD, 12),
-            Color.WHITE
-        ));
-        undoRedoPanel.setBackground(new Color(55, 55, 55));
-
-        JButton undoButton = new JButton("↶ Undo");
-        undoButton.setPreferredSize(new Dimension(85, 45));
-        undoButton.setBackground(new Color(80, 80, 80));
-        undoButton.setForeground(Color.WHITE);
-        undoButton.setFocusPainted(false);
-        undoButton.setBorder(BorderFactory.createRaisedBevelBorder());
         undoButton.addActionListener(e -> {
+            System.out.println("Undo 버튼 클릭! canUndo: " + manager.canUndo());
             if (manager.canUndo()) {
-                manager.undo();
+                boolean success = manager.undo();
+                System.out.println("Undo 실행 결과: " + success);
                 updateButtonStates();
             }
         });
-        undoRedoPanel.add(undoButton);
+        toolPanel.add(undoButton);
 
-        JButton redoButton = new JButton("↷ Redo");
-        redoButton.setPreferredSize(new Dimension(85, 45));
+        // Redo 버튼
+        JButton redoButton = new JButton("Redo");
+        redoButton.setPreferredSize(new Dimension(70, 40));
         redoButton.setBackground(new Color(80, 80, 80));
         redoButton.setForeground(Color.WHITE);
+        redoButton.setFont(new Font("Arial", Font.BOLD, 12));
         redoButton.setFocusPainted(false);
-        redoButton.setBorder(BorderFactory.createRaisedBevelBorder());
+        redoButton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.DARK_GRAY, 2),
+            BorderFactory.createEmptyBorder(2, 2, 2, 2)
+        ));
         redoButton.addActionListener(e -> {
+            System.out.println("Redo 버튼 클릭! canRedo: " + manager.canRedo());
             if (manager.canRedo()) {
-                manager.redo();
+                boolean success = manager.redo();
+                System.out.println("Redo 실행 결과: " + success);
                 updateButtonStates();
             }
         });
-        undoRedoPanel.add(redoButton);
+        toolPanel.add(redoButton);
 
-        add(undoRedoPanel);
+        add(toolPanel);
     }
 
     /**
@@ -248,7 +245,7 @@ public class EntityPalettePanel extends JPanel {
                 }
             }
         };
-        button.setPreferredSize(new Dimension(75, 50));
+        button.setPreferredSize(new Dimension(70, 40));
         button.setBackground(originalColor);
         button.setToolTipText(entityType.getDisplayName());
         button.setBorder(BorderFactory.createCompoundBorder(
@@ -261,8 +258,8 @@ public class EntityPalettePanel extends JPanel {
         String buttonText = entityType.getDisplayName().split(" ")[0];
         button.setText(buttonText);
 
-        // 모든 텍스트를 어두운 색으로 일관성 있게 설정
-        button.setForeground(Color.BLACK);
+        // 모든 텍스트를 흰색으로 설정
+        button.setForeground(Color.WHITE);
         button.setFont(new Font("Arial", Font.BOLD, 12));
 
         // 액션 리스너 추가
@@ -276,6 +273,21 @@ public class EntityPalettePanel extends JPanel {
                     manager.cancelSelection();
                 }
                 updateButtonStates();
+            }
+        });
+
+        // 포커스 리스너 추가 - 키보드 방향키 이동 시 선택 상태 업데이트
+        button.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                // 포커스를 받을 때 다른 버튼들의 선택 해제
+                clearOtherSelections(null);
+                updateButtonStates();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                // 포커스를 잃을 때 처리 (필요시)
             }
         });
 

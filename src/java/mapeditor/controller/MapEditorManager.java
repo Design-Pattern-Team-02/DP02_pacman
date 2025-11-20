@@ -53,6 +53,8 @@ public class MapEditorManager {
     private void initializeComponents() {
         this.mapData = new MapData();
         this.stateContext = new EditorStateContext(mapData);
+        // 순환 의존성 방지: EditorStateContext 생성 후 manager 설정
+        this.stateContext.setManager(this);
         this.commandManager = new CommandManager();
         this.autoSaveEnabled = false;
         this.lastSavedFilePath = null;
