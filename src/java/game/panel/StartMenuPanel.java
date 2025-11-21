@@ -2,6 +2,8 @@ package game.panel;
 
 import game.GameManager;
 import game.gameStates.PlayingState;
+import game.ranking.RankingBoardPanelBefore;
+import game.ranking.RankingManager;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -89,7 +91,17 @@ public class StartMenuPanel extends JPanel {
         });
 
         rankingButton.addActionListener((ActionEvent e) -> {
-            JOptionPane.showMessageDialog(parent, "Ranking not implemented yet.", "Ranking", JOptionPane.INFORMATION_MESSAGE);
+            RankingBoardPanelBefore boardPanel = new RankingBoardPanelBefore();
+            RankingManager rankingManager = RankingManager.getInstance();
+            rankingManager.registerObserver(boardPanel);
+            rankingManager.notifyObservers();
+            parent.getContentPane().removeAll();
+            parent.getContentPane().add(boardPanel);
+            parent.revalidate();
+            parent.repaint();
+            parent.setSize(648, 496);
+            parent.setLocationRelativeTo(null);
+            parent.setVisible(true);
         });
 
         mapEditorButton.addActionListener((ActionEvent e) -> {

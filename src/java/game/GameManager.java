@@ -11,6 +11,8 @@ public class GameManager {
     private JFrame window;
     private GameState currentState;
     private String playerNickname;
+    private String selectedMapName = "default_map2";
+    private int score;
 
     private GameManager() {}
 
@@ -47,5 +49,21 @@ public class GameManager {
     }
     public String getPlayerNickname() {
         return playerNickname;
+    }
+
+    public void setSelectedMapName(String mapName) {
+        this.selectedMapName = mapName;
+    }
+
+    public String getSelectedMapName(){
+        return selectedMapName;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public int getScore() {
+        return score;
     }
 }

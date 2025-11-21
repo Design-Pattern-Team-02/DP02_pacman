@@ -35,6 +35,7 @@ public class Game implements Observer {
 
         //Chargement du fichier csv du niveau
         List<List<String>> data = null;
+//      맵 변경 구현 Point
         try {
             data = new CsvReader().parseCsv(getClass().getClassLoader().getResource("level/level.csv").toURI());
         } catch (URISyntaxException e) {
@@ -155,10 +156,11 @@ public class Game implements Observer {
             gh.getState().eaten(); //S'il existe une transition particulière quand le fantôme est mangé, son état change en conséquence
         }else if (!(gh.getState() instanceof EatenMode)) {
             GameManager gameManager= GameManager.getInstance();
+            gameManager.setScore(PlayingState.getUIPanel().getScore());
+            GameOverState gameOverState = new GameOverState();
+            gameOverState.saveRanking();
             SwingUtilities.invokeLater(() -> {
-                gameManager.changeState(
-                        new GameOverState(gameManager.getPlayerNickname(), PlayingState.getUIPanel().getScore())
-                );
+                gameManager.changeState(gameOverState);
             });
         }
     }

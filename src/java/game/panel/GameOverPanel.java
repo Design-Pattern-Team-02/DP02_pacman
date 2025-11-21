@@ -2,6 +2,9 @@ package game.panel;
 
 import game.GameManager;
 import game.gameStates.StartMenuState;
+import game.ranking.RankingBoardPanelAfter;
+import game.ranking.RankingBoardPanelBefore;
+import game.ranking.RankingManager;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -47,7 +50,17 @@ public class GameOverPanel extends JPanel {
         replayButton.addActionListener((ActionEvent e) -> gameManager.changeState(new StartMenuState()));
 
         rankingButton.addActionListener((ActionEvent e) -> {
-            JOptionPane.showMessageDialog(parent, "Ranking not implemented yet.", "Ranking", JOptionPane.INFORMATION_MESSAGE);
+            RankingBoardPanelAfter boardPanel = new RankingBoardPanelAfter();
+            RankingManager rankingManager = RankingManager.getInstance();
+            rankingManager.registerObserver(boardPanel);
+            rankingManager.notifyObservers();
+            parent.getContentPane().removeAll();
+            parent.getContentPane().add(boardPanel);
+            parent.revalidate();
+            parent.repaint();
+            parent.setSize(648, 496);
+            parent.setLocationRelativeTo(null);
+            parent.setVisible(true);
         });
     }
 
