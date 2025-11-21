@@ -4,6 +4,7 @@ import game.Game;
 import game.Observer;
 import game.Sujet;
 import game.entities.ghosts.Ghost;
+import game.entities.superPacGums.*;
 import game.utils.CollisionDetector;
 import game.utils.KeyHandler;
 import game.utils.WallCollisionDetector;
@@ -62,7 +63,7 @@ public class Pacman extends MovingEntity implements Sujet {
     }
 
     @Override
-    public void update() {
+    public void before_updatePosition(){
         //On teste à chaque fois si Pacman est en contact avec une PacGum, une SuperPacGum, ou un fantôme, et les observers sont notifiés en conséquence
         PacGum pg = (PacGum) collisionDetector.checkCollision(this, PacGum.class);
         if (pg != null) {
@@ -78,11 +79,11 @@ public class Pacman extends MovingEntity implements Sujet {
         if (gh != null) {
             notifyObserverGhostCollision(gh);
         }
+    }
 
-        //S'il n'y a pas de mur à la prochaine position potentielle de Pacman, on met à jour sa position
-        if (!WallCollisionDetector.checkWallCollision(this, xSpd, ySpd)) {
-            updatePosition();
-        }
+    @Override
+    public boolean updatePositionCondition() {
+        return !WallCollisionDetector.checkWallCollision(this, xSpd, ySpd);
     }
 
     public void setCollisionDetector(CollisionDetector collisionDetector) {
@@ -112,5 +113,12 @@ public class Pacman extends MovingEntity implements Sujet {
     @Override
     public void notifyObserverGhostCollision(Ghost gh) {
         observerCollection.forEach(obs -> obs.updateGhostCollision(gh));
+    }
+
+    @Override
+    public void superPacGumEaten(SuperPacGum spg){
+        if(!(spg instanceof PacmanSuperPacGum)){
+            throw new IllegalArgumentException("Invalid SuperPacGum type. Expected PacmanSuperPacGum, but got: " + spg.getClass().getSimpleName());
+        }
     }
 }

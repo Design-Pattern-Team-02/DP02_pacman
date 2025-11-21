@@ -2,7 +2,6 @@ package game.ghostStates;
 
 import game.entities.ghosts.Ghost;
 import game.utils.Utils;
-import jdk.jshell.execution.Util;
 
 //Classe pour décrire l'état concret d'un fantôme effrayé (après que Pacman ait mangé une SuperPacGum)
 public class FrightenedMode extends GhostState{

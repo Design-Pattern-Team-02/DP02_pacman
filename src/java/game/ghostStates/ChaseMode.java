@@ -10,7 +10,7 @@ public class ChaseMode extends GhostState{
 
     //Transition lorsqu'une SuperPacGum est mangée
     @Override
-    public void superPacGumEaten() {
+    public void frightenedGhostSuperPacGunEaten() {
         ghost.switchFrightenedMode();
     }
 
