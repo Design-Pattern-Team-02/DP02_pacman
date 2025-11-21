@@ -32,9 +32,9 @@ public class EraseState implements EditorState {
     public void handleMouseClick(int gridX, int gridY, int button) {
         if (button == MouseEvent.BUTTON1) { // 좌클릭
             if (canEraseAtCurrentPosition) {
-                // Command Pattern을 위한 준비
-                // 현재는 직접 삭제, 나중에 Command로 래핑 예정
-                mapData.removeEntity(gridX, gridY);
+                // Mediator Pattern을 통한 Command 실행
+                // Context가 MapEditorManager의 Command Pattern 실행을 중재
+                context.requestRemoveEntity(gridX, gridY);
             }
         } else if (button == MouseEvent.BUTTON3) { // 우클릭
             // 우클릭으로 지우개 모드 취소
@@ -55,6 +55,11 @@ public class EraseState implements EditorState {
         // 현재 위치에 삭제할 엔티티가 있는지 확인
         EntityType currentEntity = mapData.getEntityAt(gridX, gridY);
         canEraseAtCurrentPosition = (currentEntity != null && currentEntity != EntityType.EMPTY);
+    }
+
+    @Override
+    public void handleMouseDrag(int gridX, int gridY) {
+        // EraseState에서는 드래그 삭제 지원 안함 (필요시 구현 가능)
     }
 
     @Override

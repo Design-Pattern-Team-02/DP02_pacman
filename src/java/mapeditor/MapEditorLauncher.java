@@ -21,8 +21,8 @@ public class MapEditorLauncher {
             System.err.println("시스템 Look and Feel 설정 실패: " + e.getMessage());
         }
 
-        // Splash Screen 표시 (선택적)
-        showSplashScreen();
+        // Splash Screen 제거 - 바로 시작
+        // showSplashScreen();
 
         // EDT(Event Dispatch Thread)에서 GUI 생성
         SwingUtilities.invokeLater(() -> {
@@ -32,10 +32,8 @@ public class MapEditorLauncher {
                 System.out.println("Pacman Map Editor가 성공적으로 시작되었습니다.");
             } catch (Exception e) {
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(null,
-                    "맵 에디터 실행 중 오류가 발생했습니다:\n" + e.getMessage(),
-                    "실행 오류",
-                    JOptionPane.ERROR_MESSAGE);
+                // 오류 다이얼로그 대신 콘솔 출력
+                System.err.println("맵 에디터 실행 중 오류가 발생했습니다: " + e.getMessage());
                 System.exit(1);
             }
         });

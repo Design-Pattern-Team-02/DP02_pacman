@@ -52,7 +52,7 @@ public class CsvMapWriter {
             parentDir.mkdirs();
         }
 
-        // 논리적 그리드를 CSV 크기로 확장 (56×62)
+        // 논리적 그리드를 CSV 크기로 확장 (56×60)
         EntityType[][] expandedData = expandMapData(mapData);
 
         // CSV 파일 작성
@@ -68,7 +68,8 @@ public class CsvMapWriter {
     }
 
     /**
-     * 논리적 그리드(28×31)를 CSV 그리드(56×62)로 확장
+     * 논리적 그리드(14×15)를 CSV 그리드(56×62)로 확장
+     * 하단 2행(60-61)을 벽으로 채움
      */
     private static EntityType[][] expandMapData(EntityType[][] logicalGrid) {
         int logicalHeight = logicalGrid.length;
@@ -83,28 +84,41 @@ public class CsvMapWriter {
             }
         }
 
-        // 각 논리적 칸을 2×2로 확장
+        // 각 논리적 칸을 4×4로 확장
         for (int logicalY = 0; logicalY < logicalHeight && logicalY < MapData.HEIGHT; logicalY++) {
             for (int logicalX = 0; logicalX < logicalWidth && logicalX < MapData.WIDTH; logicalX++) {
                 EntityType entity = logicalGrid[logicalY][logicalX];
 
-                int csvX = logicalX * 2;
-                int csvY = logicalY * 2;
+                int csvX = logicalX * 4;
+                int csvY = logicalY * 4;
 
                 if (csvY < MapData.CSV_HEIGHT && csvX < MapData.CSV_WIDTH) {
-                    // 벽은 2×2 전체를 채움
+                    // 벽은 4×4 전체를 채움
                     if (entity == EntityType.WALL || entity == EntityType.GHOST_HOUSE_WALL) {
-                        for (int dy = 0; dy < 2 && csvY + dy < MapData.CSV_HEIGHT; dy++) {
-                            for (int dx = 0; dx < 2 && csvX + dx < MapData.CSV_WIDTH; dx++) {
+                        for (int dy = 0; dy < 4 && csvY + dy < MapData.CSV_HEIGHT; dy++) {
+                            for (int dx = 0; dx < 4 && csvX + dx < MapData.CSV_WIDTH; dx++) {
                                 expanded[csvY + dy][csvX + dx] = entity;
                             }
                         }
                     }
-                    // 다른 엔티티는 좌측 상단에만 배치
+                    // 팩검/슈퍼팩검은 4×4 블록의 (1,1) 위치에 배치
+                    else if (entity == EntityType.PAC_GUM || entity == EntityType.SUPER_PAC_GUM) {
+                        if (csvY + 1 < MapData.CSV_HEIGHT && csvX + 1 < MapData.CSV_WIDTH) {
+                            expanded[csvY + 1][csvX + 1] = entity;
+                        }
+                    }
+                    // 다른 엔티티(팩맨, 유령)는 좌측 상단에만 배치
                     else if (entity != EntityType.EMPTY) {
                         expanded[csvY][csvX] = entity;
                     }
                 }
+            }
+        }
+
+        // 하단 2행(60-61)을 벽으로 채움 (level.csv와 크기 일치)
+        for (int y = 60; y < 62; y++) {
+            for (int x = 0; x < MapData.CSV_WIDTH; x++) {
+                expanded[y][x] = EntityType.WALL;
             }
         }
 

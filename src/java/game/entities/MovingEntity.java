@@ -1,6 +1,6 @@
 package game.entities;
 
-import game.GameplayPanel;
+import game.panel.GameplayPanel;
 import game.entities.superPacGums.SuperPacGum;
 
 import javax.imageio.ImageIO;

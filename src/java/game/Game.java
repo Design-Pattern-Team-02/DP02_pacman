@@ -10,6 +10,8 @@ import game.entities.ghostDecorator.*;
 import game.entities.pacmanDecorator.*;
 import game.entities.ghosts.Blinky;
 import game.entities.ghosts.Ghost;
+import game.gameStates.GameOverState;
+import game.gameStates.PlayingState;
 import game.ghostFactory.*;
 import game.ghostStates.EatenMode;
 import game.ghostStates.FrightenedMode;
@@ -17,6 +19,7 @@ import game.utils.CollisionDetector;
 import game.utils.CsvReader;
 import game.utils.KeyHandler;
 
+import javax.swing.*;
 import java.awt.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -45,6 +48,7 @@ public class Game implements Observer {
 
         //Chargement du fichier csv du niveau
         List<List<String>> data = null;
+//      맵 변경 구현 Point
         try {
             data = new CsvReader().parseCsv(getClass().getClassLoader().getResource("level/level.csv").toURI());
         } catch (URISyntaxException e) {
@@ -68,7 +72,8 @@ public class Game implements Observer {
                     pacman.setCollisionDetector(collisionDetector);
 
                     //Enregistrement des différents observers de Pacman
-                    pacman.registerObserver(GameLauncher.getUIPanel());
+//                   GameLauncher.getUIPanel() -> PlayingState.getUIPanel() 수정
+                    pacman.registerObserver(PlayingState.getUIPanel());
                     pacman.registerObserver(this);
 
                     pacman = new SheildPacmanDecorator(pacman, collisionDetector);
@@ -271,8 +276,13 @@ public class Game implements Observer {
         if (gh.getState() instanceof FrightenedMode) {
             gh.getState().eaten(); //S'il existe une transition particulière quand le fantôme est mangé, son état change en conséquence
         }else if (!(gh.getState() instanceof EatenMode)) {
-            System.out.println("Game over !\nScore : " + GameLauncher.getUIPanel().getScore()); //Quand Pacman rentre en contact avec un Fantôme qui n'est ni effrayé, ni mangé, c'est game over !
-            System.exit(0); //TODO
+            GameManager gameManager= GameManager.getInstance();
+            gameManager.setScore(PlayingState.getUIPanel().getScore());
+            GameOverState gameOverState = new GameOverState();
+            gameOverState.saveRanking();
+            SwingUtilities.invokeLater(() -> {
+                gameManager.changeState(gameOverState);
+            });
         }
     }
 

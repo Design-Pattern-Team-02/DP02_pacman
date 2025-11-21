@@ -48,9 +48,9 @@ public class PlacementState implements EditorState {
 
         if (button == MouseEvent.BUTTON1) { // 좌클릭
             if (canPlaceAtCurrentPosition) {
-                // Command Pattern을 위한 준비
-                // 현재는 직접 배치, 나중에 Command로 래핑 예정
-                boolean placed = mapData.placeEntity(gridX, gridY, selectedEntityType);
+                // Mediator Pattern을 통한 Command 실행
+                // Context가 MapEditorManager의 Command Pattern 실행을 중재
+                boolean placed = context.requestPlaceEntity(gridX, gridY, selectedEntityType);
 
                 if (placed && selectedEntityType.isRequired() &&
                     mapData.getEntityCount(selectedEntityType) >= selectedEntityType.getMaxCount()) {
@@ -92,6 +92,33 @@ public class PlacementState implements EditorState {
                 EntityType existingEntity = mapData.getEntityAt(gridX, gridY);
                 canPlaceAtCurrentPosition = (existingEntity == selectedEntityType);
             }
+        }
+    }
+
+    @Override
+    public void handleMouseDrag(int gridX, int gridY) {
+        // 벽(WALL)만 드래그로 배치 가능
+        if (selectedEntityType != EntityType.WALL) {
+            return;
+        }
+
+        // 현재 위치 업데이트
+        currentGridPosition = new Point(gridX, gridY);
+
+        // 편집 불가능한 영역 체크 (고스트 집)
+        if (!mapData.isEditable(gridX, gridY)) {
+            canPlaceAtCurrentPosition = false;
+            return;
+        }
+
+        // 현재 위치에 배치 가능한지 확인
+        EntityType currentEntity = mapData.getEntityAt(gridX, gridY);
+        if (currentEntity == EntityType.EMPTY) {
+            // 배치 가능한 경우 즉시 배치
+            canPlaceAtCurrentPosition = true;
+            context.requestPlaceEntity(gridX, gridY, selectedEntityType);
+        } else {
+            canPlaceAtCurrentPosition = false;
         }
     }
 
