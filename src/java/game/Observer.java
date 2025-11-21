@@ -1,7 +1,7 @@
 package game;
 
 import game.entities.PacGum;
-import game.entities.SuperPacGum;
+import game.entities.superPacGums.SuperPacGum;
 import game.entities.ghosts.Ghost;
 
 //Interface de l'observer

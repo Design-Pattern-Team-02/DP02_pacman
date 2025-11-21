@@ -1,6 +1,8 @@
 package game.entities;
 
 import game.panel.GameplayPanel;
+import game.entities.superPacGums.SuperPacGum;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -31,10 +33,17 @@ public abstract class MovingEntity extends Entity {
 
     @Override
     public void update() {
-        updatePosition();
+        before_updatePosition();
+        if(updatePositionCondition()){
+            updatePosition(getxSpd(), getySpd(), getSpd());
+        }
     }
+    public boolean updatePositionCondition(){
+        return true;
+    }
+    abstract public void before_updatePosition();
 
-    public void updatePosition() {
+    public void updatePosition(int xSpd, int ySpd, int spd) {
         //Mise à jour de la position de l'entité
         if (!(xSpd == 0 && ySpd == 0)) { //Si la vitesse horizontale ou la vitesse verticale n'est pas nulle, on incrémente la position horizontale et verticale en conséquence
             xPos+=xSpd;
@@ -80,7 +89,8 @@ public abstract class MovingEntity extends Entity {
     public void render(Graphics2D g) {
         //Par défaut, on considère que chaque "sprite" contient 4 variations de l'animation correspondant à une direction et chaque animation a un certain nombre d'images
         //En sachant cela, on affiche seulement la partie de l'image du sprite correspondant à la bonne direction et à la bonne frame de l'animation
-        g.drawImage(sprite.getSubimage((int)subimage * size + direction * size * nbSubimagesPerCycle, 0, size, size), this.xPos, this.yPos,null);
+//        g.drawImage(sprite.getSubimage((int)subimage * size + direction * size * nbSubimagesPerCycle, 0, size, size), this.xPos, this.yPos,null);
+        g.drawImage(getSprite().getSubimage((int)getSubimage() * size + getDirection() * size * getNbSubimagesPerCycle(), 0, size, size), getxPos(), getyPos(),null);
     }
 
     //Méthode pour savoir si l'entité est bien positionnée sur une case de la grille de la zone de jeu ou non
@@ -154,4 +164,6 @@ public abstract class MovingEntity extends Entity {
     public int getSpd() {
         return spd;
     }
+
+    public abstract void superPacGumEaten(SuperPacGum spg);
 }

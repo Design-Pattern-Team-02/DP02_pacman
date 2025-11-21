@@ -2,8 +2,10 @@ package game.entities.ghosts;
 
 import game.Game;
 import game.entities.MovingEntity;
+import game.entities.levelStrategies.LevelStrategy;
 import game.ghostStates.*;
 import game.ghostStrategies.IGhostStrategy;
+import game.entities.superPacGums.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -60,7 +62,6 @@ public abstract class Ghost extends MovingEntity {
     }
 
     public void switchFrightenedMode() {
-        frightenedTimer = 0;
         state = frightenedMode;
     }
 
@@ -92,15 +93,35 @@ public abstract class Ghost extends MovingEntity {
         return state;
     }
 
+    /**
+     * 레벨 전략에 따른 해산(Frightened) 시간 계산
+     * 기본 7초 (420 프레임)에서 레벨별 감소율 적용
+     *
+     * @return 조정된 해산 시간 (프레임 단위)
+     */
+    protected int getAdjustedFrightenedTime() {
+        LevelStrategy levelStrategy = Game.getLevelStrategy();
+        if (levelStrategy == null) {
+            return 60 * 7; // 기본 7초
+        }
+
+        int baseTime = 60 * 7; // 420 프레임 (7초)
+        double reduction = levelStrategy.getFrightenedTimerReduction();
+        int adjustedTime = (int) Math.round(baseTime * (1.0 - reduction));
+
+        return adjustedTime;
+    }
+
     @Override
-    public void update() {
+    public void before_updatePosition(){
         if (!Game.getFirstInput()) return; //Les fantômes ne bougent pas tant que le joueur n'a pas bougé
 
         //Si le fantôme est dans l'état effrayé, un timer de 7s se lance, et l'état sera notifié ensuite afin d'appliquer la transition adéquate
         if (state == frightenedMode) {
             frightenedTimer++;
 
-            if (frightenedTimer >= (60 * 7)) {
+            int frightenedDuration = getAdjustedFrightenedTime();
+            if (frightenedTimer >= frightenedDuration) {
                 state.timerFrightenedModeOver();
             }
         }
@@ -112,6 +133,7 @@ public abstract class Ghost extends MovingEntity {
 
             if ((isChasing && modeTimer >= (60 * 20)) || (!isChasing && modeTimer >= (60 * 5))) {
                 state.timerModeOver();
+                modeTimer = 0;
                 isChasing = !isChasing;
             }
         }
@@ -128,14 +150,16 @@ public abstract class Ghost extends MovingEntity {
 
         //Selon l'état, le fantôme calcule sa prochaine direction, et sa position est ensuite mise à jour
         state.computeNextDir();
-        updatePosition();
     }
 
     @Override
     public void render(Graphics2D g) {
         //Différents sprites sont utilisés selon l'état du fantôme (après réflexion, il aurait peut être été plus judicieux de faire une méthode "render" dans GhostState)
+        int adjustedFrightenedTime = getAdjustedFrightenedTime();
+        int warningTime = (int)(adjustedFrightenedTime * 0.7); // 70% 지점부터 깜빡임
+
         if (state == frightenedMode) {
-            if (frightenedTimer <= (60 * 5) || frightenedTimer%20 > 10) {
+            if (frightenedTimer <= warningTime || frightenedTimer%20 > 10) {
                 g.drawImage(frightenedSprite1.getSubimage((int)subimage * size, 0, size, size), this.xPos, this.yPos,null);
             }else{
                 g.drawImage(frightenedSprite2.getSubimage((int)subimage * size, 0, size, size), this.xPos, this.yPos,null);
@@ -146,5 +170,25 @@ public abstract class Ghost extends MovingEntity {
             g.drawImage(sprite.getSubimage((int)subimage * size + direction * size * nbSubimagesPerCycle, 0, size, size), this.xPos, this.yPos,null);
         }
 
+    }
+
+    @Override
+    public void superPacGumEaten(SuperPacGum spg){
+        if(!(spg instanceof GhostSuperPacGum)){
+            throw new IllegalArgumentException("Invalid SuperPacGum type. Expected GhostSuperPacGum, but got: " + spg.getClass().getSimpleName());
+        }
+        else if(spg instanceof FrightenedGhostSuperPacGum){
+            frightenedTimer = 0;
+            state.frightenedGhostSuperPacGunEaten();
+
+            // 해산시간 로그 출력
+            LevelStrategy levelStrategy = Game.getLevelStrategy();
+            if (levelStrategy != null) {
+                int frightenedTime = getAdjustedFrightenedTime();
+                double reduction = levelStrategy.getFrightenedTimerReduction();
+                System.out.println("고스트 해산 시작: " + (frightenedTime / 60.0) + "초 " +
+                        "(기본 7초에서 " + (int)(reduction * 100) + "% 감소)");
+            }
+        }
     }
 }
