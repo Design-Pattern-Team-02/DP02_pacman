@@ -50,7 +50,7 @@ public class Game implements Observer {
         List<List<String>> data = null;
 //      맵 변경 구현 Point
         try {
-            data = new CsvReader().parseCsv(getClass().getClassLoader().getResource("level/level.csv").toURI());
+            data = new CsvReader().parseCsv(getClass().getClassLoader().getResource("level/"+GameManager.getInstance().getSelectedMapName()+".csv").toURI());
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

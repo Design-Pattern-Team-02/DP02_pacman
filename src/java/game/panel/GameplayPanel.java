@@ -1,6 +1,7 @@
 package game.panel;
 
 import game.Game;
+import game.GameManager;
 import game.utils.KeyHandler;
 
 import javax.imageio.ImageIO;
@@ -30,8 +31,7 @@ public class GameplayPanel extends JPanel implements Runnable {
         setPreferredSize(new Dimension(width, height));
         setFocusable(true);
         requestFocus();
-        //"img/custom_map_001_bg.png"
-        backgroundImage = ImageIO.read(getClass().getClassLoader().getResource("img/background.png"));
+        backgroundImage = ImageIO.read(getClass().getClassLoader().getResource("img/"+ GameManager.getInstance().getSelectedMapName() +"_bg.png"));
     }
 
     @Override
