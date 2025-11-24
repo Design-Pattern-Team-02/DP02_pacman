@@ -9,6 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 //Panneau de la "zone de jeu"
 public class GameplayPanel extends JPanel implements Runnable {
@@ -31,7 +33,21 @@ public class GameplayPanel extends JPanel implements Runnable {
         setPreferredSize(new Dimension(width, height));
         setFocusable(true);
         requestFocus();
-        backgroundImage = ImageIO.read(getClass().getClassLoader().getResource("img/"+ GameManager.getInstance().getSelectedMapName() +"_bg.png"));
+        String mapName = GameManager.getInstance().getSelectedMapName();
+        Path imgPath = Paths.get("src/resources/img/" + mapName + "_bg.png");
+
+// 파일이 없으면 클래스패스 리소스 폴백
+        if (!imgPath.toFile().exists()) {
+            try {
+                imgPath = Paths.get(getClass().getClassLoader()
+                        .getResource("img/" + mapName + "_bg.png").toURI());
+            } catch (Exception e) {
+                throw new RuntimeException("배경 이미지를 찾을 수 없습니다: " + mapName, e);
+            }
+        }
+
+        backgroundImage = ImageIO.read(imgPath.toFile());
+
     }
 
     @Override

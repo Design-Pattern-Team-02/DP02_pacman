@@ -21,9 +21,11 @@ public class MapLevelSelectPanel extends JPanel {
     private final JButton leftButton = new JButton("<");
     private final JButton rightButton = new JButton(">");
     private final JPanel levelButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+    private final ResourceUtils resourceUtils;
 
     public MapLevelSelectPanel() {
-        this.maps = ResourceUtils.listLevelNames();
+        this.resourceUtils = new ResourceUtils();
+        this.maps = resourceUtils.listLevelNames();
 
         setBackground(Color.BLACK);
         setLayout(new BorderLayout());
@@ -123,7 +125,7 @@ public class MapLevelSelectPanel extends JPanel {
     private void loadCurrentMap() {
         String name = maps.get(currentIndex);
         nameLabel.setText("Map: " + name);
-        BufferedImage img = ResourceUtils.loadMapImage(name);
+        BufferedImage img = resourceUtils.loadMapImage(name);
         if (img != null) {
             int maxW = 400;
             double ratio = (double) img.getHeight() / img.getWidth();

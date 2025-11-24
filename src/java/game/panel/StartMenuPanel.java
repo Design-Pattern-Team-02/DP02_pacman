@@ -1,7 +1,6 @@
 package game.panel;
 
 import game.GameManager;
-import game.gameStates.PlayingState;
 import game.ranking.RankingBoardPanelBefore;
 import game.ranking.RankingManager;
 
