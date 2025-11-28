@@ -22,6 +22,8 @@ import game.utils.KeyHandler;
 import javax.swing.*;
 import java.awt.*;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,8 +52,20 @@ public class Game implements Observer {
         List<List<String>> data = null;
 //      맵 변경 구현 Point
         try {
-            data = new CsvReader().parseCsv(getClass().getClassLoader().getResource("level/level.csv").toURI());
-        } catch (URISyntaxException e) {
+            String mapName = GameManager.getInstance().getSelectedMapName();
+            Path levelPath = Paths.get("src/resources/level/" + mapName + ".csv");
+            // 파일이 없으면 클래스패스 리소스 폴백
+            if (!levelPath.toFile().exists()) {
+                try {
+                    levelPath = Paths.get(getClass().getClassLoader()
+                            .getResource("level/" + mapName + ".csv").toURI());
+                } catch (Exception e) {
+                    throw new RuntimeException("맵 파일을 찾을 수 없습니다: " + mapName, e);
+                }
+            }
+
+            data = new CsvReader().parseCsv(levelPath.toUri());
+        } catch (Exception e) {
             e.printStackTrace();
         }
         int cellsPerRow = data.get(0).size();

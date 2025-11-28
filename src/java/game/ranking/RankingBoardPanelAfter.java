@@ -46,6 +46,7 @@ public class RankingBoardPanelAfter extends JPanel implements Observer {
         backButton.addActionListener(e -> {
             firePropertyChange("back", false, true);
             GameManager.getInstance().changeState(new GameOverState());
+            RankingManager.getInstance().removeObserver(this);
         });
         topPanel.add(backButton, BorderLayout.WEST);
 
