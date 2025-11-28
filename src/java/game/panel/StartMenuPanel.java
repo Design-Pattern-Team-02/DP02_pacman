@@ -1,7 +1,6 @@
 package game.panel;
 
 import game.GameManager;
-import game.gameStates.PlayingState;
 import game.ranking.RankingBoardPanelBefore;
 import game.ranking.RankingManager;
 
@@ -216,7 +215,15 @@ public class StartMenuPanel extends JPanel {
             } else {
                 // 닉네임을 GameManager에 저장하고 게임 시작
                 gameManager.setPlayerNickname(nickname);
-                gameManager.changeState(new PlayingState());
+//               여기에 MapLevelSelectPanel 호출
+                MapLevelSelectPanel mapPanel = new MapLevelSelectPanel();
+                parent.getContentPane().removeAll();
+                parent.getContentPane().add(mapPanel);
+                parent.revalidate();
+                parent.repaint();
+                parent.setSize(548, 596);
+                parent.setLocationRelativeTo(null);
+                parent.setVisible(true);
             }
         });
 
