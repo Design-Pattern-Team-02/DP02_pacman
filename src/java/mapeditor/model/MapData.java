@@ -75,7 +75,7 @@ public class MapData {
     }
 
     /**
-     * 고스트 집 구조 생성
+     * 고스트 집 구조 생성 및 고스트 자동 배치
      */
     private void createGhostHouse() {
         int startX = GHOST_HOUSE_X;
@@ -93,10 +93,10 @@ public class MapData {
         grid[startY][startX + 3] = EntityType.WALL;
         grid[startY][startX + 4] = EntityType.WALL;
 
-        // 두 번째 줄: 벽 빈공간 빈공간 빈공간 벽
+        // 두 번째 줄: 벽 Pinky Inky 빈공간 벽
         grid[startY + 1][startX] = EntityType.WALL;
-        grid[startY + 1][startX + 1] = EntityType.EMPTY;
-        grid[startY + 1][startX + 2] = EntityType.EMPTY;
+        grid[startY + 1][startX + 1] = EntityType.PINKY;   // 고스트하우스 안
+        grid[startY + 1][startX + 2] = EntityType.INKY;    // 고스트하우스 안
         grid[startY + 1][startX + 3] = EntityType.EMPTY;
         grid[startY + 1][startX + 4] = EntityType.WALL;
 
@@ -107,16 +107,17 @@ public class MapData {
         grid[startY + 2][startX + 3] = EntityType.WALL;
         grid[startY + 2][startX + 4] = EntityType.WALL;
 
-        // 고스트 집의 벽과 문만 편집 불가능으로 설정 (빈 공간은 편집 가능)
+        // Blinky: 고스트하우스 문 바로 위 (outsideHouse)
+        grid[startY - 1][startX + 2] = EntityType.BLINKY;
+
+        // 고스트 집 영역 편집 불가능 설정
         for (int y = 0; y < GHOST_HOUSE_HEIGHT; y++) {
             for (int x = 0; x < GHOST_HOUSE_WIDTH; x++) {
-                EntityType cellType = grid[startY + y][startX + x];
-                // 벽이나 고스트 하우스 문인 경우만 편집 불가
-                if (cellType == EntityType.WALL || cellType == EntityType.GHOST_HOUSE_WALL) {
-                    editableGrid[startY + y][startX + x] = false;
-                }
+                editableGrid[startY + y][startX + x] = false;
             }
         }
+        // Blinky 위치도 편집 불가
+        editableGrid[startY - 1][startX + 2] = false;
     }
 
     /**
@@ -303,13 +304,17 @@ public class MapData {
     }
 
     /**
-     * 논리적 그리드를 실제 CSV 크기로 확장 (4x4 확장)
+     * 논리적 그리드를 실제 CSV 크기로 확장 (4x4 확장 + 오프셋)
      * 14×15 → 56×62
-     * 각 논리적 칸을 4×4로 확장하고, 벽은 4×4 전체 채우고 다른 엔티티는 좌측 상단에만 표기
-     * 하단 2행(60-61)을 벽으로 채움
+     * 오프셋 적용: X -2, Y +2 (고스트하우스 문이 CSV (26, 26)에 위치하도록)
      */
     public EntityType[][] getExpandedGridForCSV() {
         EntityType[][] expanded = new EntityType[CSV_HEIGHT][CSV_WIDTH];
+
+        // 오프셋: 고스트하우스를 default_map.csv와 동일한 위치에 배치
+        // Blinky 위치: 논리적 (7, 5) → CSV (7*4-2, 5*4+1) = (26, 21)
+        final int OFFSET_X = -2;
+        final int OFFSET_Y = 1;
 
         // 먼저 전체를 EMPTY로 초기화
         for (int y = 0; y < CSV_HEIGHT; y++) {
@@ -318,41 +323,45 @@ public class MapData {
             }
         }
 
-        // 논리적 그리드의 각 칸을 4×4로 확장
-        // 엔티티는 좌측 상단(0,0)에만 배치
+        // 논리적 그리드의 각 칸을 4×4로 확장 (오프셋 적용)
         for (int logicalY = 0; logicalY < HEIGHT; logicalY++) {
             for (int logicalX = 0; logicalX < WIDTH; logicalX++) {
                 EntityType entity = grid[logicalY][logicalX];
 
-                // CSV 좌표 계산 (4배 확장)
-                int csvX = logicalX * 4;
-                int csvY = logicalY * 4;
+                // CSV 좌표 계산 (4배 확장 + 오프셋)
+                int csvX = logicalX * 4 + OFFSET_X;
+                int csvY = logicalY * 4 + OFFSET_Y;
 
-                // 범위 체크
-                if (csvY < CSV_HEIGHT && csvX < CSV_WIDTH) {
-                    // 벽의 경우 4×4 전체를 채움
-                    if (entity == EntityType.WALL || entity == EntityType.GHOST_HOUSE_WALL) {
-                        for (int dy = 0; dy < 4 && csvY + dy < CSV_HEIGHT; dy++) {
-                            for (int dx = 0; dx < 4 && csvX + dx < CSV_WIDTH; dx++) {
-                                expanded[csvY + dy][csvX + dx] = entity;
+                // 벽의 경우 4×4 전체를 채움
+                if (entity == EntityType.WALL || entity == EntityType.GHOST_HOUSE_WALL) {
+                    for (int dy = 0; dy < 4; dy++) {
+                        for (int dx = 0; dx < 4; dx++) {
+                            int finalX = csvX + dx;
+                            int finalY = csvY + dy;
+                            if (finalX >= 0 && finalX < CSV_WIDTH && finalY >= 0 && finalY < CSV_HEIGHT) {
+                                expanded[finalY][finalX] = entity;
                             }
                         }
                     }
-                    // 팩검/슈퍼팩검은 4×4 블록의 (1,1) 위치에 배치
-                    else if (entity == EntityType.PAC_GUM || entity == EntityType.SUPER_PAC_GUM) {
-                        if (csvY + 1 < CSV_HEIGHT && csvX + 1 < CSV_WIDTH) {
-                            expanded[csvY + 1][csvX + 1] = entity;
-                        }
+                }
+                // 팩검/슈퍼팩검은 4×4 블록의 (1,1) 위치에 배치
+                else if (entity == EntityType.PAC_GUM || entity == EntityType.SUPER_PAC_GUM) {
+                    int finalX = csvX + 1;
+                    int finalY = csvY + 1;
+                    if (finalX >= 0 && finalX < CSV_WIDTH && finalY >= 0 && finalY < CSV_HEIGHT) {
+                        expanded[finalY][finalX] = entity;
                     }
-                    // 다른 엔티티(팩맨, 유령)는 좌측 상단에만 배치
-                    else if (entity != EntityType.EMPTY) {
+                }
+                // 다른 엔티티(팩맨, 유령)는 좌측 상단에만 배치
+                else if (entity != EntityType.EMPTY) {
+                    if (csvX >= 0 && csvX < CSV_WIDTH && csvY >= 0 && csvY < CSV_HEIGHT) {
                         expanded[csvY][csvX] = entity;
                     }
                 }
             }
         }
 
-        // 하단 2행(60-61)을 벽으로 채움 (level.csv와 크기 일치)
+        // 하단 2행(60-61)을 벽으로 채움
         for (int y = 60; y < 62; y++) {
             for (int x = 0; x < CSV_WIDTH; x++) {
                 expanded[y][x] = EntityType.WALL;
