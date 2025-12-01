@@ -68,14 +68,19 @@ public class CsvMapWriter {
     }
 
     /**
-     * 논리적 그리드(14×15)를 CSV 그리드(56×62)로 확장
-     * 하단 2행(60-61)을 벽으로 채움
+     * 논리적 그리드(14×15)를 CSV 그리드(56×62)로 확장 (오프셋 적용)
+     * 오프셋: X -2, Y +2 (고스트하우스 문이 CSV (26, 26)에 위치하도록)
      */
     private static EntityType[][] expandMapData(EntityType[][] logicalGrid) {
         int logicalHeight = logicalGrid.length;
         int logicalWidth = logicalHeight > 0 ? logicalGrid[0].length : 0;
 
         EntityType[][] expanded = new EntityType[MapData.CSV_HEIGHT][MapData.CSV_WIDTH];
+
+        // 오프셋: 고스트하우스를 default_map.csv와 동일한 위치에 배치
+        // Blinky 위치: 논리적 (7, 5) → CSV (7*4-2, 5*4+1) = (26, 21)
+        final int OFFSET_X = -2;
+        final int OFFSET_Y = 1;
 
         // 전체를 EMPTY로 초기화
         for (int y = 0; y < MapData.CSV_HEIGHT; y++) {
@@ -84,38 +89,44 @@ public class CsvMapWriter {
             }
         }
 
-        // 각 논리적 칸을 4×4로 확장
+        // 각 논리적 칸을 4×4로 확장 (오프셋 적용)
         for (int logicalY = 0; logicalY < logicalHeight && logicalY < MapData.HEIGHT; logicalY++) {
             for (int logicalX = 0; logicalX < logicalWidth && logicalX < MapData.WIDTH; logicalX++) {
                 EntityType entity = logicalGrid[logicalY][logicalX];
 
-                int csvX = logicalX * 4;
-                int csvY = logicalY * 4;
+                int csvX = logicalX * 4 + OFFSET_X;
+                int csvY = logicalY * 4 + OFFSET_Y;
 
-                if (csvY < MapData.CSV_HEIGHT && csvX < MapData.CSV_WIDTH) {
-                    // 벽은 4×4 전체를 채움
-                    if (entity == EntityType.WALL || entity == EntityType.GHOST_HOUSE_WALL) {
-                        for (int dy = 0; dy < 4 && csvY + dy < MapData.CSV_HEIGHT; dy++) {
-                            for (int dx = 0; dx < 4 && csvX + dx < MapData.CSV_WIDTH; dx++) {
-                                expanded[csvY + dy][csvX + dx] = entity;
+                // 벽은 4×4 전체를 채움
+                if (entity == EntityType.WALL || entity == EntityType.GHOST_HOUSE_WALL) {
+                    for (int dy = 0; dy < 4; dy++) {
+                        for (int dx = 0; dx < 4; dx++) {
+                            int finalX = csvX + dx;
+                            int finalY = csvY + dy;
+                            if (finalX >= 0 && finalX < MapData.CSV_WIDTH && finalY >= 0 && finalY < MapData.CSV_HEIGHT) {
+                                expanded[finalY][finalX] = entity;
                             }
                         }
                     }
-                    // 팩검/슈퍼팩검은 4×4 블록의 (1,1) 위치에 배치
-                    else if (entity == EntityType.PAC_GUM || entity == EntityType.SUPER_PAC_GUM) {
-                        if (csvY + 1 < MapData.CSV_HEIGHT && csvX + 1 < MapData.CSV_WIDTH) {
-                            expanded[csvY + 1][csvX + 1] = entity;
-                        }
+                }
+                // 팩검/슈퍼팩검은 4×4 블록의 (1,1) 위치에 배치
+                else if (entity == EntityType.PAC_GUM || entity == EntityType.SUPER_PAC_GUM) {
+                    int finalX = csvX + 1;
+                    int finalY = csvY + 1;
+                    if (finalX >= 0 && finalX < MapData.CSV_WIDTH && finalY >= 0 && finalY < MapData.CSV_HEIGHT) {
+                        expanded[finalY][finalX] = entity;
                     }
-                    // 다른 엔티티(팩맨, 유령)는 좌측 상단에만 배치
-                    else if (entity != EntityType.EMPTY) {
+                }
+                // 다른 엔티티(팩맨, 유령)는 좌측 상단에만 배치
+                else if (entity != EntityType.EMPTY) {
+                    if (csvX >= 0 && csvX < MapData.CSV_WIDTH && csvY >= 0 && csvY < MapData.CSV_HEIGHT) {
                         expanded[csvY][csvX] = entity;
                     }
                 }
             }
         }
 
-        // 하단 2행(60-61)을 벽으로 채움 (level.csv와 크기 일치)
+        // 하단 2행(60-61)을 벽으로 채움
         for (int y = 60; y < 62; y++) {
             for (int x = 0; x < MapData.CSV_WIDTH; x++) {
                 expanded[y][x] = EntityType.WALL;
@@ -286,6 +297,7 @@ public class CsvMapWriter {
 
     /**
      * 맵 데이터 검증 (저장 전 확인용)
+     * Blinky, Pinky, Inky는 자동 배치되므로 검증하지 않음
      * @param mapData 검증할 맵 데이터
      * @return 검증 통과 여부
      */
@@ -294,11 +306,8 @@ public class CsvMapWriter {
             return false;
         }
 
-        // 필수 엔티티 개수 확인
+        // 필수 엔티티 개수 확인 (Pacman, Clyde만)
         int pacmanCount = 0;
-        int blinkyCount = 0;
-        int pinkyCount = 0;
-        int inkyCount = 0;
         int clydeCount = 0;
 
         for (EntityType[] row : mapData) {
@@ -309,15 +318,6 @@ public class CsvMapWriter {
                     case PACMAN:
                         pacmanCount++;
                         break;
-                    case BLINKY:
-                        blinkyCount++;
-                        break;
-                    case PINKY:
-                        pinkyCount++;
-                        break;
-                    case INKY:
-                        inkyCount++;
-                        break;
                     case CLYDE:
                         clydeCount++;
                         break;
@@ -327,9 +327,8 @@ public class CsvMapWriter {
             }
         }
 
-        // 각 필수 엔티티가 정확히 1개씩 있는지 확인
-        return pacmanCount == 1 && blinkyCount == 1 && pinkyCount == 1 &&
-               inkyCount == 1 && clydeCount == 1;
+        // Pacman 1개, Clyde 1개 확인
+        return pacmanCount == 1 && clydeCount == 1;
     }
 
     /**
