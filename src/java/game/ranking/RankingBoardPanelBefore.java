@@ -49,8 +49,8 @@ public class RankingBoardPanelBefore extends JPanel implements Observer {
         });
         topPanel.add(backButton, BorderLayout.WEST);
 
-        JLabel titleLabel = new JLabel("🏆 TOP RANKINGS 🏆", SwingConstants.CENTER);
-        titleLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 28));
+        JLabel titleLabel = new JLabel("TOP RANKINGS", SwingConstants.CENTER);
+        titleLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 28));
         titleLabel.setForeground(Color.YELLOW);
         topPanel.add(titleLabel, BorderLayout.NORTH);
 
