@@ -40,6 +40,9 @@ public class RankingBoardPanelAfter extends JPanel implements Observer {
         JButton backButton = new JButton("Back");
         backButton.setFont(new Font("Arial", Font.BOLD, 14));
         backButton.setPreferredSize(new Dimension(100, 30));
+        backButton.setOpaque(true);
+        backButton.setContentAreaFilled(true);
+        backButton.setBorderPainted(false);
         backButton.setBackground(Color.GRAY);
         backButton.setForeground(Color.WHITE);
         backButton.setFocusPainted(false);
@@ -65,7 +68,7 @@ public class RankingBoardPanelAfter extends JPanel implements Observer {
         topPanel.add(rightSpacer, BorderLayout.EAST);
 
         JLabel titleLabel = new JLabel("🏆 TOP RANKINGS 🏆", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
+        titleLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 28));
         titleLabel.setForeground(Color.YELLOW);
         topPanel.add(titleLabel, BorderLayout.NORTH);
 
