@@ -31,16 +31,15 @@ public class PlayingState implements GameState{
         window.pack();
         window.setLocationRelativeTo(null);
 
-        // 표시된 뒤 안전하게 포커스를 요청
-        SwingUtilities.invokeLater(() -> {
+        if (gameplay!=null)
             gameplay.requestFocusInWindow();
-        });
     }
 
     @Override
     public void exitPanel() {
         // 필요시 정리 코드 추가
-        gameplay.stop();
+        if (gameplay!=null)
+            gameplay.stop();
         gameplay=null;
         uiPanel=null;
     }
