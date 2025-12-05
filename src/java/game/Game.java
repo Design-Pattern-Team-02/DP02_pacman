@@ -43,6 +43,9 @@ public class Game implements Observer {
     private static LevelStrategy levelStrategy;
 
     public Game(){
+        // static 변수 초기화 (맵 변경 시 이전 데이터 제거)
+        walls = new ArrayList();
+
         //Initialisation du jeu
 
         // 레벨 Strategy 초기화 (Strategy 패턴)

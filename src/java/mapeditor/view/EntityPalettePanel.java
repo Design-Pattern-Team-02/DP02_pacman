@@ -71,9 +71,6 @@ public class EntityPalettePanel extends JPanel {
         requiredPanel.setBackground(new Color(55, 55, 55));
 
         addEntityButton(requiredPanel, EntityType.PACMAN, Color.YELLOW);
-        addEntityButton(requiredPanel, EntityType.BLINKY, Color.RED);
-        addEntityButton(requiredPanel, EntityType.PINKY, Color.PINK);
-        addEntityButton(requiredPanel, EntityType.INKY, Color.CYAN);
         addEntityButton(requiredPanel, EntityType.CLYDE, Color.ORANGE);
 
         add(requiredPanel);

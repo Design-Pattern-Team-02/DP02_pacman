@@ -289,33 +289,6 @@ public class MapGridPanel extends JPanel implements MapObserver {
                 }
             }
         }
-
-        // 고스트 집 영역 테두리 강조
-        g.setStroke(new BasicStroke(2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10.0f, new float[]{5.0f, 3.0f}, 0.0f));
-        g.setColor(new Color(200, 100, 255));
-
-        // 고스트 집 전체 영역 테두리 (하드코딩된 위치 사용)
-        int ghostHouseX = 11;
-        int ghostHouseY = 14;
-        int ghostHouseWidth = 5;
-        int ghostHouseHeight = 3;
-
-        g.drawRect(
-            ghostHouseX * CELL_SIZE + 2,
-            ghostHouseY * CELL_SIZE + 2,
-            ghostHouseWidth * CELL_SIZE - 4,
-            ghostHouseHeight * CELL_SIZE - 4
-        );
-
-        // "GHOST HOUSE" 텍스트
-        g.setFont(new Font("Arial", Font.BOLD, 10));
-        g.setColor(new Color(200, 100, 255, 200));
-        String text = "GHOST HOUSE";
-        FontMetrics fm = g.getFontMetrics();
-        int textWidth = fm.stringWidth(text);
-        int textX = ghostHouseX * CELL_SIZE + (ghostHouseWidth * CELL_SIZE - textWidth) / 2;
-        int textY = ghostHouseY * CELL_SIZE - 5;
-        g.drawString(text, textX, textY);
     }
 
     /**
