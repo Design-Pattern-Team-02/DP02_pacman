@@ -31,6 +31,11 @@ public class GhostDecorator extends Ghost {
     }
 
     @Override
+    public int getSize() {
+        return ghost.getSize();
+    }
+
+    @Override
     public Rectangle getHitbox() {
         return ghost.getHitbox();
     }
