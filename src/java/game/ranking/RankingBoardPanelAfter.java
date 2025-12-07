@@ -167,6 +167,7 @@ public class RankingBoardPanelAfter extends JPanel implements Observer {
         final String sel = toSelect;
         SwingUtilities.invokeLater(() -> {
             mapSelector.setSelectedItem(sel);
+            filterRankingsByMap();
             suppressAction = false; // 선택 완료 후 액션 허용
         });
     }
