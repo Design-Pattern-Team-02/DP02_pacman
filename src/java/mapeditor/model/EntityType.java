@@ -9,12 +9,14 @@ package mapeditor.model;
  * - 각 타입별 속성(심볼, 이름, 필수여부)을 캡슐화
  */
 public enum EntityType {
-    // 필수 엔티티 (각 1개씩만 배치 가능)
+    // 필수 엔티티 (사용자가 배치해야 함)
     PACMAN('P', "Pacman", true, 1),
-    BLINKY('b', "Blinky", true, 1),
-    PINKY('p', "Pinky", true, 1),
-    INKY('i', "Inky", true, 1),
     CLYDE('c', "Clyde", true, 1),
+
+    // 자동 배치 고스트 (편집 불가, 맵 에디터가 자동 배치)
+    BLINKY('b', "Blinky", false, 0),
+    PINKY('p', "Pinky", false, 0),
+    INKY('i', "Inky", false, 0),
 
     // 자유 배치 엔티티
     WALL('x', "Wall", false, -1),
